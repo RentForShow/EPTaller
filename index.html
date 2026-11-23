@@ -76,6 +76,7 @@ tr:hover td{background:#fafaff}tr.band:hover td{background:var(--blue)}tr.tot:ho
 .cdot{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #8a8a96;vertical-align:-4px;flex:none;text-align:center;font-size:11px;font-style:normal;line-height:14px}
 .cdot.big{width:28px;height:28px;vertical-align:middle}
 .cdot.none{background:transparent}
+@media(max-width:480px){.brand>div span{display:none}.tbtn{padding:6px 9px;font-size:12px}}
 .lbl{display:block;font-weight:bold;font-size:13px;margin-bottom:6px}
 .tg{display:inline-block;padding:1px 8px;border:1px solid var(--carbon);border-radius:10px;font-size:11px;font-weight:bold;margin-right:2px}
 .tgb{border:1px solid var(--grey);background:#fff;color:var(--carbon);border-radius:14px;padding:6px 12px;font-size:13px;margin:0 4px 6px 0;cursor:pointer}
@@ -183,7 +184,7 @@ html[data-theme=dark] tr.cancel td{color:#8a8a99}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand"><div>EPTaller<span>by ELPUTORIDER</span></div><button id="tbtn" class="tbtn" onclick="cycleTheme()" aria-label="Cambiar tema">◐ Auto</button></div><nav id="nav"></nav></header>
+<header class="top"><div class="brand"><div>EPTaller<span>by ELPUTORIDER</span></div><button id="sybadge" class="tbtn" style="display:none" onclick="go('ajustes')"></button><button id="tbtn" class="tbtn" onclick="cycleTheme()" aria-label="Cambiar tema">◐ Auto</button></div><nav id="nav"></nav></header>
 <div id="banner"></div>
 <main id="view"></main>
 <div id="bnav"></div>
@@ -243,10 +244,11 @@ function load(){
   return fix(JSON.parse(JSON.stringify(SEED)));
 }
 let S=load();
-function save(){
+function saveLocal(){
   try{localStorage.setItem(LS,JSON.stringify(S));}
   catch(e){if(!memOnly){memOnly=true;toast('⚠ Este navegador no deja guardar. Exporta una copia desde Ajustes.');}}
 }
+function save(){saveLocal();if(typeof syOn==='function'&&syOn()){SY.dirty=true;sySave();syStatus('dirty');clearTimeout(syTimer);syTimer=setTimeout(()=>syPush(),1500)}}
 let TAB=(location.hash||'#panel').slice(1);
 
 /* ---------- cálculos ---------- */
@@ -315,8 +317,9 @@ function render(){
   $('#bnav').innerHTML=BNAV.map(([k,i,l])=>`<button class="${k===bt?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join('');
   $('#view').innerHTML=VIEWS[TAB]();
   const b=S.meta.lastBackup,days=b?(Date.now()-new Date(b).getTime())/864e5:999;
-  $('#banner').innerHTML=days>14?`<p class="banner"><span>💾 Tus datos viven solo en este navegador y ${b?'la última copia es de hace '+Math.floor(days)+' días':'aún no has hecho ninguna copia'}.</span><button class="btn ghost" onclick="exportJSON()">Exportar copia ahora</button></p>`:'';
+  $('#banner').innerHTML=(days>14&&!syOn())?`<p class="banner"><span>💾 Tus datos viven solo en este navegador y ${b?'la última copia es de hace '+Math.floor(days)+' días':'aún no has hecho ninguna copia'}.</span><button class="btn ghost" onclick="exportJSON()">Exportar copia ahora</button></p>`:'';
   if(TAB==='imprimir')pdUpd();
+  if(typeof syPaint==='function')syPaint();
 }
 let MOD=null;
 function modal(title,body,onSave,opts){
@@ -808,6 +811,7 @@ function vAjustes(){
    <label>Embalaje: coste de un envío en sobre (€)<input type="number" step="any" value="${esc(S.embalaje.sobre)}" oninput="S.embalaje.sobre=num(this.value);save()"></label>
    <label>Embalaje: coste de un envío en caja (€)<input type="number" step="any" value="${esc(S.embalaje.caja)}" oninput="S.embalaje.caja=num(this.value);save()"></label></div>
    <p class="hint">Regalados: con "Sí" su coste se resta otra vez (como hacía tu Excel); con "No" se evita el doble conteo, porque ya están dentro de los fabricados.</p></section>
+  ${sySection()}
   <section class="card dark"><h3>Copia de seguridad</h3>
    <p class="sub">Todos los datos se guardan en este navegador (no en GitHub). Si borras los datos del navegador, se pierden. Exporta una copia de vez en cuando; también sirve para pasar los datos de un dispositivo a otro.</p>
    <div class="bar"><button class="btn blue" onclick="exportJSON()">⬇ Exportar copia (.json)</button><button class="btn ghost" onclick="$('#fjson').click()">⬆ Importar copia</button>
@@ -828,8 +832,88 @@ async function importJSON(file){
 }
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{S=fix(JSON.parse(JSON.stringify(SEED)));save();toast('Datos iniciales cargados');render()},'Restaurar')}
 
+/* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
+const SYNC_LS='ept_sync_v1';
+let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
+let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
+const syOn=()=>!!(SY.url&&SY.key&&SY.clave);
+function sySave(){try{localStorage.setItem(SYNC_LS,JSON.stringify(SY))}catch(e){}}
+const SYTXT={ok:['●','Sincronizado'],busy:['◆','Sincronizando…'],dirty:['▲','Pendiente de subir'],err:['✖','Sin conexión'],conf:['✖','Conflicto']};
+function syStatus(st,msg){SYST=st;SYMSG=msg||'';syPaint()}
+function syPaint(){
+  const b=document.getElementById('sybadge');
+  if(b){if(!syOn()){b.style.display='none'}else{const t=SYTXT[SYST]||['○','Nube'];b.style.display='';b.textContent=t[0]+' '+t[1]}}
+  const e=document.getElementById('systate');
+  if(e){const t=SYTXT[SYST]||['○','Sin sincronizar'];e.innerHTML=syOn()?`<b>${t[0]} ${t[1]}</b>${SYMSG?' · '+esc(SYMSG):''}${SY.rev?'<br><span class="hint">Última versión en la nube: '+new Date(SY.rev).toLocaleString('es-ES')+'</span>':''}`:'<b>○ No conectado</b>'}
+}
+async function syRpc(fn,body){
+  const r=await fetch(SY.url.replace(/\/+$/,'')+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'Content-Type':'application/json',apikey:SY.key,Authorization:'Bearer '+SY.key},body:JSON.stringify(body)});
+  if(!r.ok){const t=await r.text();throw new Error('HTTP '+r.status+(t?' · '+t.slice(0,140):''))}
+  return r.json();
+}
+async function syPush(force){
+  if(!syOn()||SYBUSY)return;
+  SYBUSY=true;syStatus('busy');
+  try{
+    const r=await syRpc('ept_set',{p_clave:SY.clave,p_data:S,p_base:force?null:(SY.rev||null),p_force:!!force});
+    if(r&&r.ok){SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok')}
+    else if(r&&r.conflict){syStatus('conf','hay una versión más nueva en la nube');syConflict(r.updated_at)}
+    else syStatus('err','respuesta inesperada');
+  }catch(e){syStatus('err',e.message)}
+  finally{SYBUSY=false}
+}
+async function syPull(manual){
+  if(!syOn()||SYBUSY)return;
+  if(MOD&&!manual)return;
+  SYBUSY=true;syStatus('busy');
+  try{
+    const r=await syRpc('ept_get',{p_clave:SY.clave});
+    SYBUSY=false;
+    if(!r||!r.data){await syPush(true);if(manual)toast('Datos subidos a la nube');return}
+    if(SY.rev===r.updated_at){if(SY.dirty)await syPush();else syStatus('ok');if(manual)toast('Ya estás al día');return}
+    if(SY.dirty||!SY.rev){syStatus('conf','los datos de la nube y los de este dispositivo son distintos');syConflict(r.updated_at,r);return}
+    syApply(r);if(manual)toast('Datos actualizados desde la nube');
+  }catch(e){SYBUSY=false;syStatus('err',e.message)}
+}
+function syApply(r){S=fix(r.data);saveLocal();SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok');render()}
+function syConflict(fecha,remote){
+  const f=fecha?new Date(fecha).toLocaleString('es-ES'):'?';
+  modal('Datos distintos en la nube',`<p>Los datos de este dispositivo y los de la nube (guardados el <b>${esc(f)}</b>) no coinciden. Elige cuáles quieres conservar; los otros se pierden.</p>
+   <div class="bar"><button class="btn blue" onclick="syChoose('nube')">☁ Usar los de la nube</button><button class="btn ghost" onclick="syChoose('local')">📱 Usar los de este dispositivo</button></div>
+   <p class="hint">Si tienes dudas, cancela, exporta una copia desde Ajustes y vuelve a sincronizar.</p>`,()=>closeModal(),{saveText:'Cancelar',cls:'ghost'});
+}
+async function syChoose(w){
+  closeModal();
+  if(w==='local'){await syPush(true);toast('Se han subido los datos de este dispositivo')}
+  else{try{const r=await syRpc('ept_get',{p_clave:SY.clave});if(r&&r.data){syApply(r);toast('Datos cargados desde la nube')}}catch(e){syStatus('err',e.message)}}
+}
+function sySection(){
+  return`<section class="card"><h3>Sincronización en la nube (Supabase)</h3>
+   <p class="sub">Para ver los mismos datos desde cualquier navegador sin iniciar sesión. Se protege con una clave de acceso que escribes una vez en cada dispositivo.</p>
+   <div class="fg">
+    <label class="w2">URL del proyecto<input id="sy_url" placeholder="https://xxxx.supabase.co" value="${esc(SY.url||'')}" autocomplete="off"></label>
+    <label class="w2">Clave pública (anon / publishable key)<input id="sy_key" placeholder="eyJ… o sb_publishable_…" value="${esc(SY.key||'')}" autocomplete="off"></label>
+    <label class="w2">Clave de acceso (mínimo 12 caracteres)<input id="sy_clave" placeholder="la misma en todos tus dispositivos" value="${esc(SY.clave||'')}" autocomplete="off"></label></div>
+   <div class="bar"><button class="btn blue" onclick="syConnect()">Conectar</button><button class="btn ghost" onclick="syGen()">Generar clave</button>
+    <button class="btn ghost" onclick="syPull(true)">Sincronizar ahora</button><button class="btn warn" onclick="syOff()">Desconectar</button></div>
+   <p id="systate"></p>
+   <p class="hint">Guarda la clave de acceso en un sitio seguro: sin ella no se pueden recuperar los datos de la nube. La URL y las claves se guardan solo en este navegador, no van en las copias .json ni en GitHub.</p></section>`;
+}
+function syGen(){const a=new Uint8Array(18);crypto.getRandomValues(a);const c='abcdefghjkmnpqrstuvwxyz23456789';document.getElementById('sy_clave').value=[...a].map(x=>c[x%c.length]).join('').replace(/(.{6})(?=.)/g,'$1-')}
+function syConnect(){
+  const u=document.getElementById('sy_url').value.trim(),k=document.getElementById('sy_key').value.trim(),c=document.getElementById('sy_clave').value.trim();
+  if(!/^https:\/\/[^ ]+$/.test(u)){toast('La URL debe empezar por https://');return}
+  if(k.length<20){toast('Pega la clave pública del proyecto');return}
+  if(c.length<12){toast('La clave de acceso necesita al menos 12 caracteres');return}
+  SY={url:u,key:k,clave:c,rev:null,dirty:false};sySave();syPaint();syPull(true);
+}
+function syOff(){SY={};sySave();SYST=null;syPaint();toast('Desconectado. Los datos siguen en este navegador.');if(TAB==='ajustes')render()}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&syOn()&&!SY.dirty)syPull()});
+window.addEventListener('online',()=>{if(syOn())(SY.dirty?syPush():syPull())});
+
 applyTheme();
 render();
+syPaint();if(syOn())syPull();
 </script>
 </body>
 </html>
