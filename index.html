@@ -77,6 +77,7 @@ tr:hover td{background:#fafaff}tr.band:hover td{background:var(--blue)}tr.tot:ho
 .cdot.big{width:28px;height:28px;vertical-align:middle}
 .cdot.none{background:transparent}
 @media(max-width:480px){.brand>div span{display:none}.tbtn{padding:6px 9px;font-size:12px}}
+.ver{font-style:normal;font-size:12px;font-weight:bold;color:#1E1E24;background:#FFD21F;border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:2px}
 .lbl{display:block;font-weight:bold;font-size:13px;margin-bottom:6px}
 .tg{display:inline-block;padding:1px 8px;border:1px solid var(--carbon);border-radius:10px;font-size:11px;font-weight:bold;margin-right:2px}
 .tgb{border:1px solid var(--grey);background:#fff;color:var(--carbon);border-radius:14px;padding:6px 12px;font-size:13px;margin:0 4px 6px 0;cursor:pointer}
@@ -184,7 +185,7 @@ html[data-theme=dark] tr.cancel td{color:#8a8a99}
 </style>
 </head>
 <body>
-<header class="top"><div class="brand"><div>EPTaller<span>by ELPUTORIDER</span></div><button id="sybadge" class="tbtn" style="display:none" onclick="go('ajustes')"></button><button id="tbtn" class="tbtn" onclick="cycleTheme()" aria-label="Cambiar tema">◐ Auto</button></div><nav id="nav"></nav></header>
+<header class="top"><div class="brand"><div>EPTaller <em class="ver" id="ver"></em><span>by ELPUTORIDER</span></div><button id="sybadge" class="tbtn" style="display:none" onclick="go('ajustes')"></button><button id="tbtn" class="tbtn" onclick="cycleTheme()" aria-label="Cambiar tema">◐ Auto</button></div><nav id="nav"></nav></header>
 <div id="banner"></div>
 <main id="view"></main>
 <div id="bnav"></div>
@@ -816,6 +817,7 @@ function vAjustes(){
    <p class="sub">Todos los datos se guardan en este navegador (no en GitHub). Si borras los datos del navegador, se pierden. Exporta una copia de vez en cuando; también sirve para pasar los datos de un dispositivo a otro.</p>
    <div class="bar"><button class="btn blue" onclick="exportJSON()">⬇ Exportar copia (.json)</button><button class="btn ghost" onclick="$('#fjson').click()">⬆ Importar copia</button>
    <button class="btn warn" onclick="resetAll()">Volver a los datos iniciales del Excel</button></div>
+   <p class="hint">Versión de la app: <b>v${APP_VERSION}</b> · ${esc(APP_NOTAS)}</p>
    <p class="hint">Última copia: ${S.meta.lastBackup?new Date(S.meta.lastBackup).toLocaleString('es-ES'):'nunca'}</p></section>`;
 }
 function setAj(k,v,txt){S.ajustes[k]=txt?v:num(v);save()}
@@ -833,6 +835,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{S=fix(JSON.parse(JSON.stringify(SEED)));save();toast('Datos iniciales cargados');render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
+const APP_VERSION='1.1';
+const APP_NOTAS='v1.1 · Sincronización en la nube (Supabase), etiquetas y filtros de filamento, color visual, modo oscuro, nombre EPTaller.';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
@@ -913,7 +917,7 @@ window.addEventListener('online',()=>{if(syOn())(SY.dirty?syPush():syPull())});
 
 applyTheme();
 render();
-syPaint();if(syOn())syPull();
+syPaint();document.getElementById('ver').textContent='v'+APP_VERSION;if(syOn())syPull();
 </script>
 </body>
 </html>
