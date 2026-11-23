@@ -922,18 +922,21 @@ function ocrResult(code){
   modal('Añadir rollo Bambu Lab',`<form id="mform" onsubmit="return false">
    <p style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><i class="cdot big" style="background:${esc(hex)}"></i><b>${esc(r[3])}</b> <span class="hint">${esc(r[1])} ${esc(r[2])} · código ${esc(code)}</span></p>
    ${ex?`<p>Ya lo tienes en la lista como <b>${esc(fName(ex))}</b>: ahora ${n0(ex.gramos)} g. El rollo se sumará a ese filamento.</p>`:`<p>No lo tienes en la lista: se creará un filamento nuevo.</p>`}
-   <div class="fg"><label>Gramos de este rollo<input type="number" name="g" step="1000" min="0" value="1000"></label></div>
-   <label style="display:flex;gap:8px;align-items:center;margin:10px 0 4px"><input type="checkbox" name="comp" style="width:auto;min-height:0"> Sumar 1 a «Comprados» (rollos comprados)</label>
+   <div class="fg"><label>Rollos que añades<input type="number" name="n" step="1" min="1" value="1" oninput="ocrTot()"></label><label>Gramos por rollo<input type="number" name="g" step="1000" min="0" value="1000" oninput="ocrTot()"></label></div><p class="hint" id="ocrtot"></p>
+   <label style="display:flex;gap:8px;align-items:center;margin:10px 0 4px"><input type="checkbox" name="comp" style="width:auto;min-height:0"> Sumar a «Comprados» (rollos comprados)</label>
    <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="rv" checked style="width:auto;min-height:0"> Marcar como revisado</label>
-   <p class="hint">Sin marcar lo de «Comprados», el rollo solo cuenta como stock (para el inventario) y no cambia lo que has comprado.</p></form>`,()=>ocrAdd(false),
-   {saveText:'Añadir',extra:`<button class="btn ghost" onclick="ocrAdd(true)">Añadir y leer otra</button>`});
+   <p class="hint">Sin marcar lo de «Comprados», los rollos solo cuentan como stock (para el inventario) y no cambia lo que has comprado.</p></form>`,()=>ocrAdd(false),
+   {saveText:'Añadir',extra:`<button class="btn ghost" onclick="ocrAdd(true)">Añadir y leer otra</button>`});ocrTot();
 }
+function ocrTot(){const e=document.getElementById('ocrtot');if(!e)return;const n=Math.floor(num(fv('n'))),g=n*num(fv('g'));e.textContent=n>0?'Se añaden '+n0(g)+' g al stock'+(n>1?' ('+n+' rollos)':''):''}
 function ocrAdd(again){
-  const r=bblFind(OCRC);if(!r)return;const g=num(fv('g')),comp=!!fv('comp'),rv=!!fv('rv'),sn=snapU();let f=ocrExist(OCRC);
-  if(f){f.gramos=num(f.gramos)+g;if(comp)f.comprados=num(f.comprados)+1}
-  else{f={id:uid('f'),material:r[1],etiquetas:[bblTag(r[2])],marca:bblMarca(),color:r[3].toUpperCase(),ref:OCRC,hex:r[4].toLowerCase(),comprados:comp?1:0,gramos:g,minimo:0,precio:0};S.filamentos.push(f)}
+  const r=bblFind(OCRC);if(!r)return;const n=Math.floor(num(fv('n'))),gr=num(fv('g')),g=n*gr,comp=!!fv('comp'),rv=!!fv('rv');
+  if(!(n>=1)){toast('Pon cuántos rollos añades (mínimo 1)');return}
+  const sn=snapU();let f=ocrExist(OCRC);
+  if(f){f.gramos=num(f.gramos)+g;if(comp)f.comprados=num(f.comprados)+n}
+  else{f={id:uid('f'),material:r[1],etiquetas:[bblTag(r[2])],marca:bblMarca(),color:r[3].toUpperCase(),ref:OCRC,hex:r[4].toLowerCase(),comprados:comp?n:0,gramos:g,minimo:0,precio:0};S.filamentos.push(f)}
   if(rv){f.rev=true;f.revF=today()}
-  save();closeModal();toastU('Añadido: '+fName(f)+' · +'+n0(g)+' g'+(comp?' · +1 comprado':''),sn);render();
+  save();closeModal();toastU('Añadido: '+fName(f)+' · '+n+(n===1?' rollo':' rollos')+' · +'+n0(g)+' g'+(comp?' · +'+n+' comprados':''),sn);render();
   if(again)setTimeout(ocrScan,150);
 }
 function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{const show=r.dataset.q.includes(v);r.style.display=show?'':'none';if(!show&&r.dataset.id&&FSEL.has(r.dataset.id)){FSEL.delete(r.dataset.id);const c=r.querySelector('.selc');if(c)c.checked=false;r.classList.remove('selected')}});fselUpd()}
@@ -1132,8 +1135,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.17';
-const APP_NOTAS='v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.18';
+const APP_NOTAS='v1.18 · Al leer la etiqueta pregunta cuántos rollos añades. v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
