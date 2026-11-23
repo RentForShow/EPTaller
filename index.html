@@ -211,6 +211,7 @@ tr.dropb td{box-shadow:inset 0 3px 0 var(--yellow)}
 tr.dropa td{box-shadow:inset 0 -3px 0 var(--yellow)}
 .lcard.dropb{box-shadow:0 -4px 0 var(--yellow)}
 .lcard.dropa{box-shadow:0 4px 0 var(--yellow)}
+.rvc{width:18px;height:18px;cursor:pointer;accent-color:#2A5CFF;vertical-align:middle;margin:0}
 .thb{background:none;border:0;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;padding:2px 4px;white-space:nowrap;min-height:0}
 .thb:hover{text-decoration:underline}
 .thb:focus-visible{outline:2px solid var(--yellow);outline-offset:1px}
@@ -799,10 +800,10 @@ const tagList=()=>{const s=new Set(TIPOS);S.filamentos.forEach(f=>(f.etiquetas||
 const marcaList=()=>[...new Set(S.filamentos.map(f=>f.marca).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
 const marcaOpts=sel=>{const L=marcaList();if(sel&&sel!=='__otra'&&!L.includes(sel))L.push(sel);L.sort((a,b)=>a.localeCompare(b,'es'));return`<option value="">Sin marca</option>`+L.map(m=>`<option value="${esc(m)}" ${m===sel?'selected':''}>${esc(m)}</option>`).join('')+`<option value="__otra">➕ Otra marca…</option>`};
 const tagChips=f=>(f.etiquetas||[]).map(t=>`<span class="tg">${esc(t)}</span>`).join(' ');
-function fClear(){FMAT='';FMARCA='';FTAG='';FALERT=false;render()}
-let FSORT={k:'',d:0};
-const FCOLS={tags:['Etiquetas','t'],marca:['Marca','t'],color:['Color','t'],ref:['Referencia','t'],rest:['Restante','n'],comp:['Total comprado','n'],min:['Mínimo','n'],precio:['Precio rollo','n'],valor:['Valor stock','n'],estado:['Estado','t']};
-function fVal(f,k){switch(k){case'tags':return(f.etiquetas||[]).join(', ');case'marca':return f.marca||'';case'color':return f.color||'';case'ref':return f.ref||'';case'rest':return num(f.gramos);case'comp':return num(f.comprados);case'min':return num(f.minimo);case'precio':return num(f.precio);case'valor':return num(f.gramos)/1000*num(f.precio);case'estado':return fEstado(f)[1]}return''}
+function fClear(){FMAT='';FMARCA='';FTAG='';FALERT=false;FREV=false;render()}
+let FREV=false,FSORT={k:'',d:0};
+const FCOLS={tags:['Etiquetas','t'],marca:['Marca','t'],color:['Color','t'],ref:['Referencia','t'],rest:['Restante','n'],comp:['Total comprado','n'],min:['Mínimo','n'],precio:['Precio rollo','n'],valor:['Valor stock','n'],estado:['Estado','t'],rev:['Revisado','n']};
+function fVal(f,k){switch(k){case'tags':return(f.etiquetas||[]).join(', ');case'marca':return f.marca||'';case'color':return f.color||'';case'ref':return f.ref||'';case'rest':return num(f.gramos);case'comp':return num(f.comprados);case'min':return num(f.minimo);case'precio':return num(f.precio);case'valor':return num(f.gramos)/1000*num(f.precio);case'estado':return fEstado(f)[1];case'rev':return f.rev?1:0}return''}
 function fSort(k){FSORT=FSORT.k!==k?{k,d:1}:FSORT.d===1?{k,d:2}:{k:'',d:0};render()}
 function fSortSet(v){const[k,d]=v.split(':');FSORT=k?{k,d:+d}:{k:'',d:0};render()}
 const fAsc=()=>FCOLS[FSORT.k][1]==='n'?FSORT.d===2:FSORT.d===1;
@@ -812,23 +813,24 @@ function fSorted(it){
 }
 function fSortTxt(){if(!FSORT.k)return'';const isN=FCOLS[FSORT.k][1]==='n';return FCOLS[FSORT.k][0]+': '+(isN?(fAsc()?'de menos a más':'de más a menos'):(fAsc()?'A → Z':'Z → A'))}
 function vFilamento(){
-  const list=S.filamentos.filter(f=>(!FMAT||f.material===FMAT)&&(!FMARCA||(FMARCA==='__none'?!f.marca:f.marca===FMARCA))&&(!FTAG||(f.etiquetas||[]).includes(FTAG))&&(!FALERT||fEstado(f)[0]!=='ok'));
+  const list=S.filamentos.filter(f=>(!FMAT||f.material===FMAT)&&(!FMARCA||(FMARCA==='__none'?!f.marca:f.marca===FMARCA))&&(!FTAG||(f.etiquetas||[]).includes(FTAG))&&(!FALERT||fEstado(f)[0]!=='ok')&&(!FREV||!f.rev));
   const valor=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),g=S.filamentos.reduce((a,f)=>a+num(f.gramos),0);
   FSEL=new Set([...FSEL].filter(id=>list.some(f=>f.id===id)));
-  const mob=isMob();let h='';const dr=!FSORT.k,NC=(FSM?12:11)+(dr?1:0);
+  const mob=isMob();let h='';const dr=!FSORT.k,NC=(FSM?12:11)+(dr?1:0)+1;
+  const rv=f=>`<input type="checkbox" class="rvc" ${f.rev?'checked':''} aria-label="Revisado: ${esc(fName(f))}" title="${f.rev?'Revisado el '+fdate(f.revF||today()):'Marcar como revisado'}" onchange="fRev('${f.id}',this.checked)">`;
   const dh=f=>dr?`<span class="drg" tabindex="0" role="button" data-id="${f.id}" aria-label="Mover ${esc(fName(f))}: arrastra o usa las flechas arriba y abajo" title="Arrastra para ordenar" onpointerdown="fdStart(event,'${f.id}')" onkeydown="fdKey(event,'${f.id}')">⠿</span>`:'';
   const cb=f=>FSM?`<input type="checkbox" class="selc" aria-label="Seleccionar ${esc(fName(f))}" ${FSEL.has(f.id)?'checked':''} onchange="fselTog('${f.id}')">`:'';
-  const th=(k,cls)=>{const on=FSORT.k===k,isN=FCOLS[k][1]==='n',ar=on?(fAsc()?' ▲':' ▼'):'';
-    return`<th class="${cls||''}" aria-sort="${on?(fAsc()?'ascending':'descending'):'none'}"><button type="button" class="thb" onclick="fSort('${k}')" title="Ordenar por ${FCOLS[k][0].toLowerCase()}: ${isN?'de más a menos':'A → Z'}, al revés, y orden original">${FCOLS[k][0]}${ar}</button></th>`};
+  const th=(k,cls,lbl)=>{const on=FSORT.k===k,isN=FCOLS[k][1]==='n',ar=on?(fAsc()?' ▲':' ▼'):'';
+    return`<th class="${cls||''}" aria-sort="${on?(fAsc()?'ascending':'descending'):'none'}"><button type="button" class="thb" onclick="fSort('${k}')" title="Ordenar por ${FCOLS[k][0].toLowerCase()}: ${isN?'de más a menos':'A → Z'}, al revés, y orden original">${lbl||FCOLS[k][0]}${ar}</button></th>`};
   matList().forEach(m=>{
     const it=fSorted(list.filter(f=>f.material===m));if(!it.length)return;
     h+=mob?`<div class="mband">${esc(m)}</div>`:`<tr class="band"><td colspan="${NC}">${esc(m)}</td></tr>`;
     it.forEach(f=>{const[k,t]=fEstado(f);
       const q=esc((fName(f)+' '+f.marca+' '+(f.etiquetas||[]).join(' ')+' '+f.material).toLowerCase());
-      h+=mob?`<div class="lcard fc ${FSEL.has(f.id)?'selected':''}" data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}"><div class="lr"><div class="cnm">${dh(f)}${cb(f)}${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${f.ref?'Ref. '+esc(f.ref)+' · ':''}${f.marca?esc(f.marca):'Sin marca'}</span></span></div>${chip(k,t)}</div>
+      h+=mob?`<div class="lcard fc ${FSEL.has(f.id)?'selected':''}" data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}"><div class="lr"><div class="cnm">${rv(f)}${dh(f)}${cb(f)}${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${f.ref?'Ref. '+esc(f.ref)+' · ':''}${f.marca?esc(f.marca):'Sin marca'}</span></span></div>${chip(k,t)}</div>
         <div class="lr" style="margin-top:5px"><span>${tagChips(f)||'<span class="hint">sin etiquetas</span>'}</span><span class="rst"><b>${rl(num(f.gramos)/1000)}</b> <span class="hint">${n0(f.gramos)} g</span></span></div>
         <div class="lr" style="margin-top:5px"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div>`
-      :`<tr data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}" class="${FSEL.has(f.id)?'selected':''}">${dr?`<td>${dh(f)}</td>`:''}${FSM?`<td>${cb(f)}</td>`:''}<td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:150px"><div class="cnm">${fSw(f,1)}<b>${esc(f.color||'(sin color)')}</b></div></td><td class="l">${f.ref?esc(f.ref):'<span class="hint">–</span>'}</td>
+      :`<tr data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}" class="${FSEL.has(f.id)?'selected':''}"><td>${rv(f)}</td>${dr?`<td>${dh(f)}</td>`:''}${FSM?`<td>${cb(f)}</td>`:''}<td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:150px"><div class="cnm">${fSw(f,1)}<b>${esc(f.color||'(sin color)')}</b></div></td><td class="l">${f.ref?esc(f.ref):'<span class="hint">–</span>'}</td>
       <td class="l"><div class="rst"><b>${rl(num(f.gramos)/1000)}</b> <span class="hint">${n0(f.gramos)} g</span></div></td>
       <td>${num(f.comprados)}</td><td>${num(f.minimo)||'–'}</td><td>${num(f.precio)?eur(f.precio):'<span class="hint">sin precio</span>'}</td><td>${eur(num(f.gramos)/1000*num(f.precio))}</td><td>${chip(k,t)}</td>
       <td style="white-space:nowrap"><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" title="Añadir un rollo nuevo (+1000 g)" onclick="filPlus('${f.id}')">+1 rollo</button></td></tr>`});
@@ -840,13 +842,15 @@ function vFilamento(){
    <select onchange="FMARCA=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Marca"><option value="">Marca: todas</option>${marcaList().map(m=>`<option ${FMARCA===m?'selected':''}>${esc(m)}</option>`).join('')}<option value="__none" ${FMARCA==='__none'?'selected':''}>Sin marca</option></select>
    <select onchange="FTAG=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Etiqueta"><option value="">Etiqueta: todas</option>${tagList().map(m=>`<option ${FTAG===m?'selected':''}>${esc(m)}</option>`).join('')}</select>
    ${mob?sortSel:''}
-   ${(FMAT||FMARCA||FTAG||FALERT)?`<button class="btn ghost" onclick="fClear()">✕ Quitar filtros</button>`:''}
+   ${(FMAT||FMARCA||FTAG||FALERT||FREV)?`<button class="btn ghost" onclick="fClear()">✕ Quitar filtros</button>`:''}
+   <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FREV?'checked':''} onchange="FREV=this.checked;render()" style="width:auto;min-height:0"> Solo sin revisar</label>
+   <span class="hint">Revisados: <b id="revcnt">${S.filamentos.filter(f=>f.rev).length} / ${S.filamentos.length}</b></span><button class="btn ghost" onclick="fRevReset()" title="Quita la marca de revisado a todos">↺ Empezar revisión</button>
    <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FALERT?'checked':''} onchange="FALERT=this.checked;render()" style="width:auto;min-height:0"> Solo alertas</label>
   </div>
   <div class="bar" style="flex-wrap:nowrap;overflow-x:auto">${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" style="flex:0 0 auto" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
   ${mob?h+`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${n0(g)} g · ${eur(valor)}</b></div></div>`
-  :`<div class="tw"><table class="fl"><tr>${dr?'<th></th>':''}${FSM?'<th><input type="checkbox" class="selc" id="selall" title="Seleccionar todos los visibles" aria-label="Seleccionar todos los visibles" onchange="fselAll(this.checked)"></th>':''}${th('tags')}${th('marca')}${th('color','l')}${th('ref','l')}${th('rest','l')}${th('comp')}${th('min')}${th('precio')}${th('valor')}${th('estado')}<th></th></tr>${h||`<tr><td colspan="${NC}" class="hint">Sin resultados.</td></tr>`}
-  <tr class="tot"><td colspan="${(FSM?5:4)+(dr?1:0)}" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
+  :`<div class="tw"><table class="fl"><tr>${th('rev','','✓')}${dr?'<th></th>':''}${FSM?'<th><input type="checkbox" class="selc" id="selall" title="Seleccionar todos los visibles" aria-label="Seleccionar todos los visibles" onchange="fselAll(this.checked)"></th>':''}${th('tags')}${th('marca')}${th('color','l')}${th('ref','l')}${th('rest','l')}${th('comp')}${th('min')}${th('precio')}${th('valor')}${th('estado')}<th></th></tr>${h||`<tr><td colspan="${NC}" class="hint">Sin resultados.</td></tr>`}
+  <tr class="tot"><td colspan="${(FSM?5:4)+(dr?1:0)+1}" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
   ${FSM?fselBar(list.length):''}${cpHist()}<p class="hint">Mostrando ${list.length} de ${S.filamentos.length} filamentos${(FMAT||FMARCA||FTAG||FALERT)?' (con filtros)':''}.${FSORT.k?' Orden: '+fSortTxt()+'.':''}${dr?' Arrastra ⠿ (o usa las flechas ↑ ↓ con el foco en él) para ordenar a tu gusto: ese es tu orden por defecto.':' Para arrastrar, quita el orden de columna (pulsa el título hasta que no tenga flecha).'}${mob?'':' Pulsa el título de una columna para ordenar: 1ª vez A → Z (o de más a menos), 2ª al revés, 3ª vuelve al orden original.'}</p><p class="legend">Estados: ● OK · ▲ BAJO (en el mínimo o por debajo) · ✖ AGOTADO (0 g).</p>`;
 }
 let FD=null;
@@ -878,6 +882,8 @@ function fdKey(e,id){
   if(!n||n.dataset.mat!==row.dataset.mat)return;
   fMove(id,n.dataset.id,!up);const h=document.querySelector('.drg[data-id="'+id+'"]');if(h)h.focus();
 }
+function fRev(id,v){const f=fil(id);if(!f)return;f.rev=!!v;f.revF=v?today():'';save();if(FREV&&v){render();return}const e=document.getElementById('revcnt');if(e)e.textContent=S.filamentos.filter(x=>x.rev).length+' / '+S.filamentos.length}
+function fRevReset(){const n=S.filamentos.filter(f=>f.rev).length;if(!n){toast('No hay ninguna marca de revisado');return}ask('Empezar una revisión nueva',`<p>Se quitará la marca de revisado a los <b>${n}</b> filamentos que la tienen, para empezar el inventario de cero.</p>`,()=>{const sn=snapU();S.filamentos.forEach(f=>{f.rev=false;f.revF=''});save();toastU('Marcas de revisión quitadas.',sn);render()},'Empezar')}
 function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{const show=r.dataset.q.includes(v);r.style.display=show?'':'none';if(!show&&r.dataset.id&&FSEL.has(r.dataset.id)){FSEL.delete(r.dataset.id);const c=r.querySelector('.selc');if(c)c.checked=false;r.classList.remove('selected')}});fselUpd()}
 function fselMode(){FSM=!FSM;FSEL.clear();render()}
 function fselBar(n){return`<div class="selbar" id="selbar"><b id="selcount"></b><span class="sp"></span><button class="btn ghost" onclick="fselAll(true)">Todos</button><button class="btn ghost" onclick="fselAll(false)">Ninguno</button><button class="btn warn" id="seldel" onclick="fDelMany()">🗑 Borrar</button></div><div style="height:96px"></div>`}
@@ -1074,8 +1080,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.12';
-const APP_NOTAS='v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.13';
+const APP_NOTAS='v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
