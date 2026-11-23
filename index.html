@@ -844,7 +844,7 @@ function vFilamento(){
    ${mob?sortSel:''}
    ${(FMAT||FMARCA||FTAG||FALERT||FREV)?`<button class="btn ghost" onclick="fClear()">✕ Quitar filtros</button>`:''}
    <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FREV?'checked':''} onchange="FREV=this.checked;render()" style="width:auto;min-height:0"> Solo sin revisar</label>
-   <span class="hint">Revisados: <b id="revcnt">${S.filamentos.filter(f=>f.rev).length} / ${S.filamentos.length}</b></span><button class="btn ghost" onclick="fRevReset()" title="Quita la marca de revisado a todos">↺ Empezar revisión</button><button class="btn ghost" onclick="fZero()" title="Pone los gramos de todos los filamentos a 0">⊘ Stock a 0</button>
+   <span class="hint">Revisados: <b id="revcnt">${S.filamentos.filter(f=>f.rev).length} / ${S.filamentos.length}</b></span><button class="btn ghost" onclick="fRevReset()" title="Quita la marca de revisado a todos">↺ Empezar revisión</button><button class="btn blue" onclick="ocrScan()" title="Haz una foto a la etiqueta de la caja Bambu Lab y añade el rollo">📷 Leer etiqueta Bambu</button><input type="file" id="ocrf" accept="image/*" style="display:none" onchange="ocrFile(this)"><button class="btn ghost" onclick="fZero()" title="Pone los gramos de todos los filamentos a 0">⊘ Stock a 0</button>
    <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FALERT?'checked':''} onchange="FALERT=this.checked;render()" style="width:auto;min-height:0"> Solo alertas</label>
   </div>
   <div class="bar" style="flex-wrap:nowrap;overflow-x:auto">${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" style="flex:0 0 auto" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
@@ -886,6 +886,56 @@ function fRev(id,v){const f=fil(id);if(!f)return;f.rev=!!v;f.revF=v?today():'';s
 function fRevReset(){const n=S.filamentos.filter(f=>f.rev).length;if(!n){toast('No hay ninguna marca de revisado');return}ask('Empezar una revisión nueva',`<p>Se quitará la marca de revisado a los <b>${n}</b> filamentos que la tienen, para empezar el inventario de cero.</p>`,()=>{const sn=snapU();S.filamentos.forEach(f=>{f.rev=false;f.revF=''});save();toastU('Marcas de revisión quitadas.',sn);render()},'Empezar')}
 function fZero(){const n=S.filamentos.filter(f=>num(f.gramos)!==0).length,g=S.filamentos.reduce((a,f)=>a+num(f.gramos),0);if(!n){toast('Todo el stock ya está a 0 g');return}
   ask('Poner todo el stock a 0',`<p>Se pondrán a <b>0 g</b> los <b>${n}</b> filamentos que ahora tienen stock (${n0(g)} g en total). Los rollos comprados, precios y marcas de revisión no cambian.</p><p class="hint">Se puede deshacer justo después con Deshacer.</p>`,()=>{const sn=snapU();S.filamentos.forEach(f=>{f.gramos=0});save();toastU('Stock de todos los filamentos puesto a 0 g.',sn);render()},'Poner a 0')}
+
+/* ---------- LECTOR DE ETIQUETA BAMBU (OCR en el navegador) ---------- */
+let TESS_P=null,OCRTOK=0;
+function tessLoad(){return TESS_P||(TESS_P=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?res(window.Tesseract):(TESS_P=null,rej(new Error('lib')));sc.onerror=()=>{TESS_P=null;rej(new Error('offline'))};document.head.appendChild(sc)}))}
+function ocrCanvas(img,ang){const mx=3000,k=Math.min(1,mx/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k),c=document.createElement('canvas'),sw=ang%180!==0;c.width=sw?h:w;c.height=sw?w:h;const x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(ang*Math.PI/180);x.drawImage(img,-w/2,-h/2,w,h);return c}
+function ocrCode(t){const m=String(t||'').match(/(?<!\d)1\d{4}(?!\d)/g)||[];return m.find(c=>bblFind(c))||''}
+function ocrScan(){const i=document.getElementById('ocrf');if(!i)return;i.value='';i.click()}
+function ocrMsg(t){const e=document.getElementById('ocrmsg');if(e)e.textContent=t}
+async function ocrFile(inp){
+  const file=inp.files&&inp.files[0];if(!file)return;const tok=++OCRTOK;
+  modal('Leyendo etiqueta','<p id="ocrmsg">Cargando el lector… la primera vez tarda unos segundos y necesita internet.</p>',()=>{OCRTOK++;closeModal()},{saveText:'Cancelar',cls:'ghost'});
+  let code='',w=null;
+  try{
+    const T=await tessLoad();if(tok!==OCRTOK)return;
+    const url=URL.createObjectURL(file),img=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('img'));im.src=url});
+    w=await T.createWorker('eng');
+    for(const psm of ['6','11']){
+      await w.setParameters({tessedit_pageseg_mode:psm});
+      for(const ang of [0,90,270,180]){
+        if(tok!==OCRTOK)break;ocrMsg('Leyendo la etiqueta… ('+(ang?'girada '+ang+'°':'foto original')+(psm==='11'?', 2.º intento':'')+')');
+        const r=await w.recognize(ocrCanvas(img,ang));code=ocrCode(r&&r.data&&r.data.text);if(code)break}
+      if(code||tok!==OCRTOK)break}
+    URL.revokeObjectURL(url);
+  }catch(e){if(tok===OCRTOK){closeModal();ocrManual('No he podido cargar el lector (¿sin internet?). Escribe a mano el «Filament Code» de la etiqueta.')}return}
+  finally{try{w&&await w.terminate()}catch(e){}}
+  if(tok!==OCRTOK)return;closeModal();
+  if(code)ocrResult(code);else ocrManual('No he encontrado un código de Bambu Lab en la foto. Prueba con otra foto más de cerca, o escribe el «Filament Code» (5 cifras).');
+}
+function ocrManual(msg){modal('Código de la etiqueta',`<p>${esc(msg)}</p><label>Filament Code<input id="ocrcode" inputmode="numeric" maxlength="5" placeholder="Ej. 10604"></label>`,()=>{const c=(document.getElementById('ocrcode').value||'').replace(/\D/g,'');if(!bblFind(c)){toast('Ese código no está en el catálogo de Bambu Lab');return}closeModal();ocrResult(c)},{saveText:'Buscar'});setTimeout(()=>{const e=document.getElementById('ocrcode');if(e)e.focus()},50)}
+function ocrExist(code){const fs=S.filamentos.filter(f=>String(f.ref||'').replace(/\D/g,'')===code);return fs.find(f=>/bambu/i.test(f.marca||''))||fs[0]||null}
+let OCRC='';
+function ocrResult(code){
+  const r=bblFind(code);if(!r)return;OCRC=code;const ex=ocrExist(code),hex=(ex&&fHex(ex))||r[4];
+  modal('Añadir rollo Bambu Lab',`<form id="mform" onsubmit="return false">
+   <p style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><i class="cdot big" style="background:${esc(hex)}"></i><b>${esc(r[3])}</b> <span class="hint">${esc(r[1])} ${esc(r[2])} · código ${esc(code)}</span></p>
+   ${ex?`<p>Ya lo tienes en la lista como <b>${esc(fName(ex))}</b>: ahora ${n0(ex.gramos)} g. El rollo se sumará a ese filamento.</p>`:`<p>No lo tienes en la lista: se creará un filamento nuevo.</p>`}
+   <div class="fg"><label>Gramos de este rollo<input type="number" name="g" step="1000" min="0" value="1000"></label></div>
+   <label style="display:flex;gap:8px;align-items:center;margin:10px 0 4px"><input type="checkbox" name="comp" style="width:auto;min-height:0"> Sumar 1 a «Comprados» (rollos comprados)</label>
+   <label style="display:flex;gap:8px;align-items:center;margin:4px 0"><input type="checkbox" name="rv" checked style="width:auto;min-height:0"> Marcar como revisado</label>
+   <p class="hint">Sin marcar lo de «Comprados», el rollo solo cuenta como stock (para el inventario) y no cambia lo que has comprado.</p></form>`,()=>ocrAdd(false),
+   {saveText:'Añadir',extra:`<button class="btn ghost" onclick="ocrAdd(true)">Añadir y leer otra</button>`});
+}
+function ocrAdd(again){
+  const r=bblFind(OCRC);if(!r)return;const g=num(fv('g')),comp=!!fv('comp'),rv=!!fv('rv'),sn=snapU();let f=ocrExist(OCRC);
+  if(f){f.gramos=num(f.gramos)+g;if(comp)f.comprados=num(f.comprados)+1}
+  else{f={id:uid('f'),material:r[1],etiquetas:[bblTag(r[2])],marca:bblMarca(),color:r[3].toUpperCase(),ref:OCRC,hex:r[4].toLowerCase(),comprados:comp?1:0,gramos:g,minimo:0,precio:0};S.filamentos.push(f)}
+  if(rv){f.rev=true;f.revF=today()}
+  save();closeModal();toastU('Añadido: '+fName(f)+' · +'+n0(g)+' g'+(comp?' · +1 comprado':''),sn);render();
+  if(again)setTimeout(ocrScan,150);
+}
 function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{const show=r.dataset.q.includes(v);r.style.display=show?'':'none';if(!show&&r.dataset.id&&FSEL.has(r.dataset.id)){FSEL.delete(r.dataset.id);const c=r.querySelector('.selc');if(c)c.checked=false;r.classList.remove('selected')}});fselUpd()}
 function fselMode(){FSM=!FSM;FSEL.clear();render()}
 function fselBar(n){return`<div class="selbar" id="selbar"><b id="selcount"></b><span class="sp"></span><button class="btn ghost" onclick="fselAll(true)">Todos</button><button class="btn ghost" onclick="fselAll(false)">Ninguno</button><button class="btn warn" id="seldel" onclick="fDelMany()">🗑 Borrar</button></div><div style="height:96px"></div>`}
@@ -1082,8 +1132,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.15';
-const APP_NOTAS='v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.16';
+const APP_NOTAS='v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
