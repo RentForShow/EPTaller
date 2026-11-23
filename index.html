@@ -273,7 +273,7 @@ function saveLocal(){
 }
 let SYSEQ=0,SYAGAIN=false;
 function save(){SAVEN++;if(UNDO){UNDO=null;const t=document.getElementById('toast');if(t&&t.querySelector('.tundo'))t.style.display='none'}saveLocal();if(typeof syOn==='function'&&syOn()){SYSEQ++;SY.dirty=true;sySave();syStatus('dirty');clearTimeout(syTimer);syTimer=setTimeout(()=>syPush(),1500)}}
-let TAB=(location.hash||'#filamento').slice(1);
+let TAB=(location.hash&&!location.hash.startsWith('#sync=')?location.hash:'#filamento').slice(1);
 
 /* ---------- cálculos ---------- */
 const AJ=()=>S.ajustes;
@@ -344,7 +344,7 @@ matchMedia('(max-width:700px)').addEventListener('change',()=>render());
 matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
 const BNAV=[['filamento','🧵','Filamento'],['productos','📦','Productos'],['pedidos','🧾','Pedidos'],['imprimir','🖨️','Imprimir'],['mas','☰','Más']];
 function go(k){if(location.hash.slice(1)===k){TAB=k;render()}else location.hash=k}
-window.addEventListener('hashchange',()=>{TAB=location.hash.slice(1);render();window.scrollTo(0,0)});
+window.addEventListener('hashchange',()=>{if(syFromHash())return;TAB=location.hash.slice(1)||'filamento';render();window.scrollTo(0,0)});
 function render(){
   const VIEWS={mas:vMas,panel:vPanel,imprimir:vImprimir,productos:vProductos,pedidos:vPedidos,filamento:vFilamento,gastos:vGastos,notas:vNotas,ajustes:vAjustes};
   if(!VIEWS[TAB])TAB='filamento';
@@ -1009,8 +1009,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.08';
-const APP_NOTAS='v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.09';
+const APP_NOTAS='v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
@@ -1050,11 +1050,12 @@ async function syPull(manual){
     SYBUSY=false;
     if(!r||!r.data){await syPush(true);if(manual)toast('Datos subidos a la nube');return}
     if(SY.rev===r.updated_at){if(SY.dirty)await syPush();else syStatus('ok');if(manual)toast('Ya estás al día');return}
+    if(SY.fresh&&!SY.dirty){syApply(r);toast('Conectado: datos descargados de la nube');return}
     if(SY.dirty||!SY.rev){syStatus('conf','los datos de la nube y los de este dispositivo son distintos');syConflict(r.updated_at,r);return}
     syApply(r);if(manual)toast('Datos actualizados desde la nube');
   }catch(e){SYBUSY=false;syStatus('err',e.message)}
 }
-function syApply(r){S=fix(r.data);freezeOrders();saveLocal();SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok');render()}
+function syApply(r){delete SY.fresh;S=fix(r.data);freezeOrders();saveLocal();SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok');render()}
 function syConflict(fecha,remote){
   const f=fecha?new Date(fecha).toLocaleString('es-ES'):'?';
   modal('Datos distintos en la nube',`<p>Los datos de este dispositivo y los de la nube (guardados el <b>${esc(f)}</b>) no coinciden. Elige cuáles quieres conservar; los otros se pierden.</p>
@@ -1076,15 +1077,33 @@ function sySection(){
    <div class="bar"><button class="btn blue" onclick="syConnect()">Conectar</button><button class="btn ghost" onclick="syGen()">Generar clave</button>
     <button class="btn ghost" onclick="syPull(true)">Sincronizar ahora</button><button class="btn warn" onclick="syOff()">Desconectar</button></div>
    <p id="systate"></p>
+   ${syOn()?`<div class="bar"><button class="btn ghost" onclick="syCopyLink()">🔗 Copiar enlace de conexión</button></div><input id="sy_link" readonly style="display:none;margin-bottom:8px" aria-label="Enlace de conexión">
+   <p class="hint">Abre ese enlace en otro navegador o dispositivo y se conecta solo, sin escribir nada. Quien tenga el enlace puede ver y cambiar tus datos: guárdalo en tu gestor de contraseñas y no lo publiques ni lo subas a GitHub.</p>`:`<label class="w2" style="margin-top:8px">¿Tienes un enlace de conexión? Pégalo aquí<input id="sy_paste" placeholder="https://…#sync=…" autocomplete="off"></label><div class="bar"><button class="btn blue" onclick="syPasteLink()">Conectar con el enlace</button></div>`}
    <p class="hint">Guarda la clave de acceso en un sitio seguro: sin ella no se pueden recuperar los datos de la nube. La URL y las claves se guardan solo en este navegador, no van en las copias .json ni en GitHub.</p></section>`;
 }
+function syLink(){const j=JSON.stringify({u:SY.url,k:SY.key,c:SY.clave});return location.origin+location.pathname+'#sync='+btoa(j).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function syParse(t){try{t=String(t||'').trim();const i=t.indexOf('sync=');if(i>=0)t=t.slice(i+5);t=t.replace(/-/g,'+').replace(/_/g,'/');while(t.length%4)t+='=';const o=JSON.parse(atob(t));return(/^https:\/\//.test(o.u)&&String(o.k).length>=20&&String(o.c).length>=12)?o:null}catch(e){return null}}
+function syApplyLink(o){
+  const same=syOn()&&SY.url===o.u&&SY.clave===o.c;
+  if(same){toast('Ya estaba conectado a la nube');return}
+  const go2=()=>{SY={url:o.u,key:o.k,clave:o.c,rev:null,dirty:false,fresh:!localStorage.getItem(LS)};sySave();syPaint();syPull(true);if(TAB==='ajustes')render()};
+  if(syOn())ask('Cambiar de nube','<p>Este navegador ya está conectado a otra nube. ¿Conectar con la del enlace?</p>',go2,'Conectar');else go2();
+}
+function syFromHash(){
+  if(!location.hash.startsWith('#sync='))return false;
+  const o=syParse(location.hash);history.replaceState(null,'',location.pathname+location.search+'#'+TAB);
+  if(o)syApplyLink(o);else toast('⚠ El enlace de conexión no es válido');
+  return true;
+}
+function syCopyLink(){const l=syLink();(navigator.clipboard?navigator.clipboard.writeText(l):Promise.reject()).then(()=>toast('Enlace copiado. Ábrelo en el otro navegador o dispositivo.')).catch(()=>{const e=document.getElementById('sy_link');if(e){e.style.display='block';e.value=l;e.select()}toast('Copia el enlace del recuadro')})}
+function syPasteLink(){const o=syParse(document.getElementById('sy_paste').value);if(!o){toast('⚠ Ese enlace no es válido');return}syApplyLink(o)}
 function syGen(){const a=new Uint8Array(18);crypto.getRandomValues(a);const c='abcdefghjkmnpqrstuvwxyz23456789';document.getElementById('sy_clave').value=[...a].map(x=>c[x%c.length]).join('').replace(/(.{6})(?=.)/g,'$1-')}
 function syConnect(){
   const u=document.getElementById('sy_url').value.trim(),k=document.getElementById('sy_key').value.trim(),c=document.getElementById('sy_clave').value.trim();
   if(!/^https:\/\/[^ ]+$/.test(u)){toast('La URL debe empezar por https://');return}
   if(k.length<20){toast('Pega la clave pública del proyecto');return}
   if(c.length<12){toast('La clave de acceso necesita al menos 12 caracteres');return}
-  SY={url:u,key:k,clave:c,rev:null,dirty:false};sySave();syPaint();syPull(true);
+  SY={url:u,key:k,clave:c,rev:null,dirty:false,fresh:!localStorage.getItem(LS)};sySave();syPaint();syPull(true);
 }
 function syOff(){SY={};sySave();SYST=null;syPaint();toast('Desconectado. Los datos siguen en este navegador.');if(TAB==='ajustes')render()}
 window.addEventListener('storage',e=>{if(e.key===LS&&e.newValue&&!MOD){try{S=fix(JSON.parse(e.newValue));freezeOrders();render()}catch(x){}}});
@@ -1095,7 +1114,7 @@ if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.se
 freezeOrders();
 applyTheme();
 render();
-syPaint();document.getElementById('ver').textContent='v'+APP_VERSION;if(syOn())syPull();
+const hs=syFromHash();syPaint();document.getElementById('ver').textContent='v'+APP_VERSION;if(!hs&&syOn())syPull();
 </script>
 </body>
 </html>
