@@ -888,16 +888,16 @@ function fZero(){const n=S.filamentos.filter(f=>num(f.gramos)!==0).length,g=S.fi
   ask('Poner todo el stock a 0',`<p>Se pondrán a <b>0 g</b> los <b>${n}</b> filamentos que ahora tienen stock (${n0(g)} g en total). Los rollos comprados, precios y marcas de revisión no cambian.</p><p class="hint">Se puede deshacer justo después con Deshacer.</p>`,()=>{const sn=snapU();S.filamentos.forEach(f=>{f.gramos=0});save();toastU('Stock de todos los filamentos puesto a 0 g.',sn);render()},'Poner a 0')}
 
 /* ---------- LECTOR DE ETIQUETA BAMBU (OCR en el navegador) ---------- */
-let TESS_P=null,OCRTOK=0;
+let TESS_P=null,OCRTOK=0,OCRLOG='';
 function tessLoad(){return TESS_P||(TESS_P=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?res(window.Tesseract):(TESS_P=null,rej(new Error('lib')));sc.onerror=()=>{TESS_P=null;rej(new Error('offline'))};document.head.appendChild(sc)}))}
-function ocrCanvas(img,ang){const mx=3000,k=Math.min(1,mx/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k),c=document.createElement('canvas'),sw=ang%180!==0;c.width=sw?h:w;c.height=sw?w:h;const x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(ang*Math.PI/180);x.drawImage(img,-w/2,-h/2,w,h);return c}
+function ocrCanvas(img,ang){const mx=2400,k=Math.min(1,mx/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k),c=document.createElement('canvas'),sw=ang%180!==0;c.width=sw?h:w;c.height=sw?w:h;const x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(ang*Math.PI/180);x.drawImage(img,-w/2,-h/2,w,h);return c}
 function ocrCode(t){const m=String(t||'').match(/(?<!\d)1\d{4}(?!\d)/g)||[];return m.find(c=>bblFind(c))||''}
 function ocrScan(){const i=document.getElementById('ocrf');if(!i)return;i.value='';i.click()}
 function ocrMsg(t){const e=document.getElementById('ocrmsg');if(e)e.textContent=t}
 async function ocrFile(inp){
   const file=inp.files&&inp.files[0];if(!file)return;const tok=++OCRTOK;
   modal('Leyendo etiqueta','<p id="ocrmsg">Cargando el lector… la primera vez tarda unos segundos y necesita internet.</p>',()=>{OCRTOK++;closeModal()},{saveText:'Cancelar',cls:'ghost'});
-  let code='',w=null;
+  let code='',w=null;OCRLOG='';
   try{
     const T=await tessLoad();if(tok!==OCRTOK)return;
     const url=URL.createObjectURL(file),img=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('img'));im.src=url});
@@ -906,15 +906,15 @@ async function ocrFile(inp){
       await w.setParameters({tessedit_pageseg_mode:psm});
       for(const ang of [0,90,270,180]){
         if(tok!==OCRTOK)break;ocrMsg('Leyendo la etiqueta… ('+(ang?'girada '+ang+'°':'foto original')+(psm==='11'?', 2.º intento':'')+')');
-        const r=await w.recognize(ocrCanvas(img,ang));code=ocrCode(r&&r.data&&r.data.text);if(code)break}
+        const r=await w.recognize(ocrCanvas(img,ang)),tx=(r&&r.data&&r.data.text)||'';OCRLOG+='['+psm+'/'+ang+'°] '+tx.replace(/\s+/g,' ').trim().slice(0,160)+'\n';code=ocrCode(tx);if(code)break}
       if(code||tok!==OCRTOK)break}
     URL.revokeObjectURL(url);
-  }catch(e){if(tok===OCRTOK){closeModal();ocrManual('No he podido cargar el lector (¿sin internet?). Escribe a mano el «Filament Code» de la etiqueta.')}return}
+  }catch(e){if(tok===OCRTOK){closeModal();OCRLOG='Error: '+(e&&e.message||e)+'\n'+OCRLOG;ocrManual('No he podido leer la foto con el lector ('+(e&&e.message==='offline'?'sin internet':'error: '+(e&&e.message||e))+'). Escribe a mano el «Filament Code» de la etiqueta.')}return}
   finally{try{w&&await w.terminate()}catch(e){}}
   if(tok!==OCRTOK)return;closeModal();
   if(code)ocrResult(code);else ocrManual('No he encontrado un código de Bambu Lab en la foto. Prueba con otra foto más de cerca, o escribe el «Filament Code» (5 cifras).');
 }
-function ocrManual(msg){modal('Código de la etiqueta',`<p>${esc(msg)}</p><label>Filament Code<input id="ocrcode" inputmode="numeric" maxlength="5" placeholder="Ej. 10604"></label>`,()=>{const c=(document.getElementById('ocrcode').value||'').replace(/\D/g,'');if(!bblFind(c)){toast('Ese código no está en el catálogo de Bambu Lab');return}closeModal();ocrResult(c)},{saveText:'Buscar'});setTimeout(()=>{const e=document.getElementById('ocrcode');if(e)e.focus()},50)}
+function ocrManual(msg){modal('Código de la etiqueta',`<p>${esc(msg)}</p>${OCRLOG?`<details><summary class="hint">Qué ha leído el lector</summary><pre style="white-space:pre-wrap;font-size:11px;max-height:160px;overflow:auto">${esc(OCRLOG)}</pre></details>`:''}<label>Filament Code<input id="ocrcode" inputmode="numeric" maxlength="5" placeholder="Ej. 10604"></label>`,()=>{const c=(document.getElementById('ocrcode').value||'').replace(/\D/g,'');if(!bblFind(c)){toast('Ese código no está en el catálogo de Bambu Lab');return}closeModal();ocrResult(c)},{saveText:'Buscar'});setTimeout(()=>{const e=document.getElementById('ocrcode');if(e)e.focus()},50)}
 function ocrExist(code){const fs=S.filamentos.filter(f=>String(f.ref||'').replace(/\D/g,'')===code);return fs.find(f=>/bambu/i.test(f.marca||''))||fs[0]||null}
 let OCRC='';
 function ocrResult(code){
@@ -1135,8 +1135,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.18';
-const APP_NOTAS='v1.18 · Al leer la etiqueta pregunta cuántos rollos añades. v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.19';
+const APP_NOTAS='v1.19 · El lector muestra qué ha leído cuando falla. v1.18 · Al leer la etiqueta pregunta cuántos rollos añades. v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
