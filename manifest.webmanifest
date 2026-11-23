@@ -1,0 +1,16 @@
+{
+  "name": "EPTaller by ELPUTORIDER",
+  "short_name": "EPTaller",
+  "description": "Gestión de filamento, productos, pedidos y gastos de impresión 3D",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#1E1E24",
+  "theme_color": "#1E1E24",
+  "lang": "es",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

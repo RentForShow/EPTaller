@@ -6,6 +6,11 @@
 <meta name="theme-color" content="#1E1E24">
 <title>EPTaller</title>
 <meta name="apple-mobile-web-app-title" content="EPTaller">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="application-name" content="EPTaller">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -73,17 +78,23 @@ tr:hover td{background:#fafaff}tr.band:hover td{background:var(--blue)}tr.tot:ho
 .chip.neu{background:#ececf0;color:var(--grey)}
 .chip.info{background:var(--blue);color:#fff}
 .neg{color:var(--red);font-weight:bold}
-.cdot{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #8a8a96;vertical-align:-4px;flex:none;text-align:center;font-size:11px;font-style:normal;line-height:14px}
-.cdot.big{width:28px;height:28px;vertical-align:middle}
+.cdot{display:inline-block;width:18px;height:18px;border-radius:5px;border:2px solid rgba(150,150,160,.75);vertical-align:-4px;flex:none;text-align:center;font-size:11px;font-style:normal;line-height:14px}
+.cdot.big{width:32px;height:32px;border-radius:8px;vertical-align:middle}
+.cnm{display:flex;align-items:center;gap:10px}.cnm>span{display:block}.cnm b,.cnm .hint{display:block}
+.rst b{display:block;font-size:16px}.rst .hint{display:block}
 .cdot.none{background:transparent}
 @media(max-width:480px){.tbtn{padding:6px 9px;font-size:12px}}
 .brand .logo{display:flex;align-items:center;gap:10px}.brand img{height:34px;width:auto;display:block}
 .ver{font-style:normal;font-size:12px;font-weight:bold;color:#1E1E24;background:#FFD21F;border-radius:3px;padding:1px 6px;margin-left:4px;vertical-align:2px}
-.cband{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;min-height:42px;border:1px solid rgba(0,0,0,.35)}
-.cband b{background:rgba(255,255,255,.93);color:#111;padding:2px 7px;border-radius:3px}
-.cband span{background:rgba(0,0,0,.78);color:#fff;font-size:11px;font-weight:bold;padding:2px 7px;border-radius:3px;white-space:nowrap}
 .cpl{border:1px solid var(--line);padding:10px;margin-bottom:10px;background:var(--pale)}
 .cpl .fg{margin-top:8px}
+.selbar{position:fixed;left:0;right:0;bottom:0;z-index:29;background:var(--pale);color:inherit;border-top:4px solid var(--yellow);padding:10px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;box-shadow:0 -4px 14px rgba(0,0,0,.35)}
+.selbar .btn:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:700px){
+.selbar{bottom:56px;flex-wrap:nowrap;gap:6px;padding:8px 10px}.selbar .btn{padding:8px 9px;font-size:13px;white-space:nowrap}#selcount{font-size:13px;white-space:nowrap}}
+input.selc{width:22px;height:22px;min-height:0;margin:0;flex:none;accent-color:#2A5CFF;cursor:pointer}
+.lcard.selected{outline:2px solid #FFD21F;outline-offset:-2px}
+tr.selected td{background:rgba(255,210,31,.14)}
 .lbl{display:block;font-weight:bold;font-size:13px;margin-bottom:6px}
 .tg{display:inline-block;padding:1px 8px;border:1px solid var(--carbon);border-radius:10px;font-size:11px;font-weight:bold;margin-right:2px}
 .tgb{border:1px solid var(--grey);background:#fff;color:var(--carbon);border-radius:14px;padding:6px 12px;font-size:13px;margin:0 4px 6px 0;cursor:pointer}
@@ -128,11 +139,6 @@ html[data-theme=dark] .tgb.on{background:#2A5CFF;color:#fff;border-color:#6C8BFF
 .tbtn{background:transparent;color:#fff;border:1px solid #6b6b7a;border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer}
 #bnav{display:none}
 .lcard{border:1px solid var(--line);border-left:5px solid var(--blue);background:var(--pale);padding:10px 12px;margin-bottom:8px}
-.lcard.fcard{padding:0;border-left-width:1px}
-.fcard .fhead{min-height:62px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:8px 12px}
-.fcard .fn{font-size:16px;padding:3px 8px;background:rgba(255,255,255,.93);color:#111;border-radius:3px}
-.fcard .fc{font-size:12px;font-weight:bold;padding:3px 8px;background:rgba(0,0,0,.78);color:#fff;border-radius:3px;white-space:nowrap}
-.fcard .fbody{padding:10px 12px 12px}
 .lcard.tot{border-left-color:var(--yellow)}
 .lcard.pk{margin-left:14px;border-left-color:var(--grey)}
 .lcard.cancel b,.lcard.cancel .kv{text-decoration:line-through;opacity:.7}
@@ -188,6 +194,11 @@ html[data-theme=dark] #toast{border:1px solid var(--line);border-left:5px solid 
 html[data-theme=dark] .ov{background:rgba(0,0,0,.7)}
 html[data-theme=dark] .sw{border-color:#bbb}
 html[data-theme=dark] tr.cancel td{color:#8a8a99}
+.thb{background:none;border:0;color:inherit;font:inherit;font-weight:inherit;cursor:pointer;padding:2px 4px;white-space:nowrap;min-height:0}
+.thb:hover{text-decoration:underline}
+.thb:focus-visible{outline:2px solid var(--yellow);outline-offset:1px}
+.tundo{margin-left:12px;background:var(--yellow);color:#1E1E24;border:0;padding:6px 12px;font-weight:700;cursor:pointer;min-height:32px;font-size:13px}
+@media(max-width:700px){#toast{bottom:78px;width:max-content}}
 </style>
 </head>
 <body>
@@ -212,7 +223,7 @@ const TIPOS=['Básico','Mate','Silk','Plus','Translúcido','Madera','Fibra de ca
 /* ---------- utilidades ---------- */
 const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num=v=>{const n=parseFloat(String(v==null?'':v).replace(',','.'));return isFinite(n)?n:0};
+const num=v=>{let t=String(v==null?'':v).trim();if(t.includes(',')){t=t.includes('.')?t.replace(/\./g,'').replace(',','.'):t.replace(',','.')}const n=parseFloat(t);return isFinite(n)?n:0};
 const NF=(o)=>new Intl.NumberFormat('es-ES',o);
 const eur=n=>NF({style:'currency',currency:'EUR'}).format(n||0);
 const eur3=n=>NF({style:'currency',currency:'EUR',minimumFractionDigits:3,maximumFractionDigits:3}).format(n||0);
@@ -230,6 +241,8 @@ const NAMED=[['negro',0,0,0],['blanco',255,255,255],['gris',128,128,128],['gris 
 function hexName(h){const m=/^#?([0-9a-f]{6})/i.exec(h||'');if(!m)return'color desconocido';const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255;let best='',bd=1e9;for(const[nm,R,G,B]of NAMED){const d=(r-R)**2+(g-G)**2+(b-B)**2;if(d<bd){bd=d;best=nm}}return best}
 const GUESS=[['translucent transp|transp',null],['ice blue|sky blue|azul claro','#8EC8F0'],['dark blue|marino','#1B2A7A'],['cobalto','#1F4FB8'],['blue gray','#6C7F95'],['cyan|turquesa','#14B8C8'],['azul|blue','#2A5CFF'],['fucsia|rosa','#E8338F'],['purpura|púrpura|malva|morado','#7B3FB0'],['naranja','#FF7F1A'],['amarill|yellow','#FFD21F'],['rojo|red','#D62828'],['verde','#1FA05A'],['oscuro|dark gray|gris oscuro','#606068'],['silver gray','#9EA3A8'],['plateado|silver|plata','#C0C4CA'],['dorado|gold|oro','#D4AF37'],['marfil|ivory','#F1EAD2'],['beis|beige','#E0CFA9'],['cf elegoo|carbon','#2B2B30'],['jade|blanco|white','#F5F5F5'],['negro|black','#1A1A1A'],['roble','#B07A3E'],['acacia|wood|madera','#A5733A']];
 function guessHex(name){const n=(name||'').toLowerCase();for(const[k,h]of GUESS){if(k.split('|').some(w=>n.includes(w)))return h||'#DDE6EE'}return''}
+const fName=f=>f?[f.color,f.ref].filter(Boolean).join(' '):'';
+const fHas=f=>!!(f.color||f.ref);
 const fHex=f=>f.hex||guessHex(f.color);
 const fSw=(f,big)=>{const h=fHex(f);return h?`<i class="cdot ${big?'big':''}" style="background:${esc(h)}" title="${esc(hexName(h))}"></i>`:'<i class="cdot none" title="sin color">?</i>'};
 const fColName=f=>{const h=fHex(f);return h?'≈ '+hexName(h):'sin color'};
@@ -240,7 +253,9 @@ function fix(d){
   d.ajustes=Object.assign({},SEED.ajustes,d.ajustes);
   d.embalaje=Object.assign({},SEED.embalaje,d.embalaje);
   ['filamentos','productos','pedidos','gastos','impresiones','compras'].forEach(k=>{d[k]=d[k]||[]});
+  d.pedidos.forEach(o=>{if(!Array.isArray(o.lineas)){const pr=d.productos.find(x=>x.id===o.producto);o.lineas=o.producto?[{producto:o.producto,cant:num(o.cant)||1,precio:pr?num(pr.precio):0,desc:num(o.desc)}]:[];delete o.producto;delete o.cant;delete o.desc}});
   d.filamentos.forEach(f=>{if(!Array.isArray(f.etiquetas))f.etiquetas=f.tipo?[f.tipo]:[]});
+  d.filamentos.forEach(f=>{if(f.ref==null){const c=String(f.color||'').replace(/\s+/g,' ').trim(),m=/^(.*?)\s*(\d{4,6}(?:\s*\(R\))?)$/.exec(c);if(m&&m[1].trim()){f.color=m[1].trim();f.ref=m[2].trim()}else{f.color=c;f.ref=''}}});
   d.filamentos.forEach(f=>{if(f.hex==null)f.hex=guessHex(f.color)});
   d.notas=d.notas==null?'':d.notas;
   d.meta=Object.assign({lastBackup:null,slotMap:{}},d.meta);
@@ -251,11 +266,13 @@ function load(){
   return fix(JSON.parse(JSON.stringify(SEED)));
 }
 let S=load();
+
 function saveLocal(){
   try{localStorage.setItem(LS,JSON.stringify(S));}
   catch(e){if(!memOnly){memOnly=true;toast('⚠ Este navegador no deja guardar. Exporta una copia desde Ajustes.');}}
 }
-function save(){saveLocal();if(typeof syOn==='function'&&syOn()){SY.dirty=true;sySave();syStatus('dirty');clearTimeout(syTimer);syTimer=setTimeout(()=>syPush(),1500)}}
+let SYSEQ=0,SYAGAIN=false;
+function save(){SAVEN++;if(UNDO){UNDO=null;const t=document.getElementById('toast');if(t&&t.querySelector('.tundo'))t.style.display='none'}saveLocal();if(typeof syOn==='function'&&syOn()){SYSEQ++;SY.dirty=true;sySave();syStatus('dirty');clearTimeout(syTimer);syTimer=setTimeout(()=>syPush(),1500)}}
 let TAB=(location.hash||'#filamento').slice(1);
 
 /* ---------- cálculos ---------- */
@@ -264,7 +281,11 @@ const fil=id=>S.filamentos.find(f=>f.id===id);
 const prod=id=>S.productos.find(p=>p.id===id);
 const rollPrice=f=>(f&&num(f.precio)>0)?num(f.precio):num(AJ().precioKg);
 const pG=f=>rollPrice(f)/1000;
-function sold(p){return S.pedidos.filter(o=>o.producto===p.id&&(o.estado==='Enviado'||o.estado==='Cobrado')).reduce((a,o)=>a+num(o.cant),0)}
+const oCount=o=>o.estado==='Enviado'||o.estado==='Cobrado';
+const lTot=l=>num(l.cant)*num(l.precio)*(1-num(l.desc)/100);
+function soldL(p){const r=[];S.pedidos.filter(oCount).forEach(o=>(o.lineas||[]).forEach(l=>{if(l.producto===p.id)r.push(l)}));return r}
+function sold(p){return soldL(p).reduce((a,l)=>a+num(l.cant),0)}
+function ingP(p){return num(p.vendAnt)*num(p.precio)+soldL(p).reduce((a,l)=>a+lTot(l),0)}
 function made(p){return num(p.fabAnt)+S.impresiones.filter(i=>i.productoId===p.id).reduce((a,i)=>a+num(i.buenas),0)}
 function vend(p){return num(p.vendAnt)+sold(p)}
 function inPacks(p){return S.productos.filter(q=>q.tipo==='Pack'&&q.base===p.id).reduce((a,q)=>a+vend(q)*num(q.uds),0)}
@@ -284,10 +305,10 @@ function embCost(p){const e=p.ficha&&p.ficha.embalaje;return e==='sobre'?num(S.e
 function costeTotal(p){return costeUsado(p)+(p.tipo==='Pack'?0:embCost(p))}
 function sugerido(c){return c>0?Math.ceil(c/(1-Math.min(.95,num(AJ().margen))))-0.01:null}
 function pstats(p){
-  const isPack=p.tipo==='Pack',v=vend(p),cu=costeUsado(p),ing=num(p.precio)*v;
+  const isPack=p.tipo==='Pack',v=vend(p),cu=costeUsado(p),ing=ingP(p);
   let ben=null,st=null,estado='',mk=null;
   if(!isPack){
-    const packIng=S.productos.filter(q=>q.tipo==='Pack'&&q.base===p.id).reduce((a,q)=>a+num(q.precio)*vend(q),0);
+    const packIng=S.productos.filter(q=>q.tipo==='Pack'&&q.base===p.id).reduce((a,q)=>a+ingP(q),0);
     mk=made(p);
     ben=ing-mk*cu-(AJ().regalados==='Sí'?num(p.regalados)*cu:0)-num(p.extra)+packIng;
     st=stockP(p);
@@ -296,11 +317,19 @@ function pstats(p){
   return{v,cu,ing,ben,st,estado,mk};
 }
 function fEstado(f){const g=num(f.gramos),m=num(f.minimo)*1000;if(g<=0)return['out','AGOTADO'];if(m>0&&g<=m)return['low','BAJO'];return['ok','OK']}
-const oTotal=o=>{const p=prod(o.producto);return num(o.cant)*(p?num(p.precio):0)*(1-num(o.desc)/100)};
-const oCoste=o=>{const p=prod(o.producto);return p?num(o.cant)*costeUsado(p):0};
+const oTotal=o=>(o.lineas||[]).reduce((a,l)=>a+lTot(l),0);
+const oUds=o=>(o.lineas||[]).reduce((a,l)=>a+num(l.cant),0);
+const lCoste=l=>{if(l.coste!=null&&l.coste!=='')return num(l.cant)*num(l.coste);const p=prod(l.producto);return p?num(l.cant)*costeUsado(p):0};
+const oCoste=o=>(o.lineas||[]).reduce((a,l)=>a+lCoste(l),0);
+function freezeOrders(){S.pedidos.forEach(o=>{if(oCount(o))(o.lineas||[]).forEach(l=>{if(l.coste==null||l.coste===''){const p=prod(l.producto);if(p)l.coste=costeUsado(p)}})})}
+const oProds=o=>(o.lineas||[]).map(l=>{const p=prod(l.producto);return n0(l.cant)+' × '+(p?esc(p.nombre):'(producto borrado)')+(num(l.desc)?' (−'+n0(l.desc)+'%)':'')});
 const gTotal=g=>num(g.cant)*num(g.precio);
 
 /* ---------- interfaz general ---------- */
+let UNDO=null,SAVEN=0;
+function toastU(t,snap){const e=$('#toast');e.textContent=t+' ';const b=document.createElement('button');b.type='button';b.className='tundo';b.textContent='↩ Deshacer';b.onclick=undoNow;e.appendChild(b);e.style.display='block';UNDO={snap,n:SAVEN};clearTimeout(toast.t);toast.t=setTimeout(()=>{e.style.display='none';UNDO=null},10000)}
+function undoNow(){if(!UNDO||UNDO.n!==SAVEN){toast('Ya no se puede deshacer');return}const sn=UNDO.snap;UNDO=null;S=fix(JSON.parse(sn));freezeOrders();save();toast('Hecho: se ha deshecho');render()}
+const snapU=()=>JSON.stringify(S);
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3800)}
 const NAV=[['filamento','Filamento'],['productos','Productos'],['pedidos','Pedidos'],['panel','Panel'],['imprimir','Imprimir'],['gastos','Gastos'],['notas','Notas'],['ajustes','Ajustes']];
 function themePref(){try{return localStorage.getItem('ept_tema')||'auto'}catch(e){return'auto'}}
@@ -319,6 +348,7 @@ window.addEventListener('hashchange',()=>{TAB=location.hash.slice(1);render();wi
 function render(){
   const VIEWS={mas:vMas,panel:vPanel,imprimir:vImprimir,productos:vProductos,pedidos:vPedidos,filamento:vFilamento,gastos:vGastos,notas:vNotas,ajustes:vAjustes};
   if(!VIEWS[TAB])TAB='filamento';
+  if(TAB!=='filamento'&&FSM){FSM=false;FSEL.clear()}
   $('#nav').innerHTML=NAV.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
   const bt=['panel','gastos','notas','ajustes'].includes(TAB)?'mas':TAB;
   $('#bnav').innerHTML=BNAV.map(([k,i,l])=>`<button class="${k===bt?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join('');
@@ -327,6 +357,7 @@ function render(){
   $('#banner').innerHTML=(days>14&&!syOn())?`<p class="banner"><span>💾 Tus datos viven solo en este navegador y ${b?'la última copia es de hace '+Math.floor(days)+' días':'aún no has hecho ninguna copia'}.</span><button class="btn ghost" onclick="exportJSON()">Exportar copia ahora</button></p>`:'';
   if(TAB==='imprimir')pdUpd();
   if(typeof syPaint==='function')syPaint();
+  if(typeof fselUpd==='function')fselUpd();
 }
 let MOD=null;
 function modal(title,body,onSave,opts){
@@ -344,8 +375,8 @@ function matList(){const s=new Set(MATS);S.filamentos.forEach(f=>f.material&&s.a
 function filOptions(sel){
   let h='<option value="">— elige filamento —</option>';
   matList().forEach(m=>{
-    const it=S.filamentos.filter(f=>f.material===m&&f.color);
-    if(it.length)h+=`<optgroup label="${esc(m)}">`+it.map(f=>`<option value="${f.id}" ${f.id===sel?'selected':''}>${esc(f.color)}${f.marca?' · '+esc(f.marca):''} — ${n0(f.gramos)} g</option>`).join('')+'</optgroup>';
+    const it=S.filamentos.filter(f=>f.material===m&&fHas(f));
+    if(it.length)h+=`<optgroup label="${esc(m)}">`+it.map(f=>`<option value="${f.id}" ${f.id===sel?'selected':''}>${esc(fName(f))}${f.marca?' · '+esc(f.marca):''} — ${n0(f.gramos)} g</option>`).join('')+'</optgroup>';
   });
   return h;
 }
@@ -380,48 +411,66 @@ function edCells(id){
 }
 
 /* ---------- PANEL ---------- */
+let PP={k:'todo',a:'',b:''};
+const PPL={todo:'Todo',mes:'Este mes',mesant:'Mes pasado','30':'Últimos 30 días',trim:'Este trimestre',anio:'Este año',anioant:'Año pasado',rango:'Personalizado…'};
+function ppRange(){
+  const t=new Date(),y=t.getFullYear(),m=t.getMonth(),d=t.getDate();
+  const D=(yy,mm,dd)=>{const x=new Date(yy,mm,dd);return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0')};
+  switch(PP.k){case'mes':return[D(y,m,1),D(y,m+1,0)];case'mesant':return[D(y,m-1,1),D(y,m,0)];case'30':return[D(y,m,d-29),D(y,m,d)];case'trim':{const q=Math.floor(m/3)*3;return[D(y,q,1),D(y,q+3,0)]}case'anio':return[D(y,0,1),D(y,11,31)];case'anioant':return[D(y-1,0,1),D(y-1,11,31)];case'rango':return[PP.a||'0000-01-01',PP.b||'9999-12-31'];default:return null}
+}
 function vPanel(){
+  const rg=ppRange(),inR=d=>!rg||(!!d&&d>=rg[0]&&d<=rg[1]);
   const rows=S.productos.map(p=>({p,s:pstats(p)}));
-  const ingresos=rows.reduce((a,r)=>a+r.s.ing,0);
-  const benef=rows.reduce((a,r)=>a+(r.s.ben||0),0);
-  const gastosD=S.gastos.filter(g=>g.desc).reduce((a,g)=>a+gTotal(g),0);
+  let ingresos,benef,cvend=0,unidades,top,gastosL,nOrd=0;
+  if(!rg){
+    ingresos=rows.reduce((a,r)=>a+r.s.ing,0);benef=rows.reduce((a,r)=>a+(r.s.ben||0),0);
+    unidades=rows.reduce((a,r)=>a+(r.p.tipo==='Pack'?0:r.s.v),0);
+    top=rows.filter(r=>r.s.ben!==null).sort((a,b)=>b.s.ben-a.s.ben).slice(0,8);gastosL=S.gastos.filter(g=>g.desc);
+  }else{
+    const os=S.pedidos.filter(o=>oCount(o)&&inR(o.fecha));nOrd=os.length;const by={};unidades=0;ingresos=0;
+    os.forEach(o=>(o.lineas||[]).forEach(l=>{const p=prod(l.producto),ing=lTot(l),c=lCoste(l);ingresos+=ing;cvend+=c;if(!(p&&p.tipo==='Pack'))unidades+=num(l.cant);
+      const k=p?p.id:'?';(by[k]=by[k]||{p:p||{nombre:'(producto borrado)'},s:{ben:0}}).s.ben+=ing-c}));
+    benef=ingresos-cvend;top=Object.values(by).sort((a,b)=>b.s.ben-a.s.ben).slice(0,8);gastosL=S.gastos.filter(g=>g.desc&&inR(g.fecha));
+  }
+  const gastosD=gastosL.reduce((a,g)=>a+gTotal(g),0);
+  const sinFecha=rg?S.gastos.filter(g=>g.desc&&!g.fecha).length:0;
+  const comprasP=S.compras.filter(c=>inR(c.fecha)),comprasT=comprasP.reduce((a,c)=>a+num(c.total),0);
   const real=benef-gastosD,rec=gastosD>0?Math.max(0,benef)/gastosD:0;
   const valor=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0);
   const rollos=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000,0);
-  const alert=S.filamentos.filter(f=>f.color&&fEstado(f)[0]!=='ok');
+  const alert=S.filamentos.filter(f=>fHas(f)&&fEstado(f)[0]!=='ok');
   const pend=S.pedidos.filter(o=>o.estado==='Pendiente').length;
   const porCobrar=S.pedidos.filter(o=>o.estado==='Enviado').reduce((a,o)=>a+oTotal(o),0);
-  const unidades=rows.reduce((a,r)=>a+(r.p.tipo==='Pack'?0:r.s.v),0);
-  const top=rows.filter(r=>r.s.ben!==null).sort((a,b)=>b.s.ben-a.s.ben).slice(0,8);
   const maxB=Math.max(1,...top.map(r=>Math.abs(r.s.ben)));
-  const cats={};S.gastos.filter(g=>g.desc).forEach(g=>{cats[g.cat]=(cats[g.cat]||0)+gTotal(g)});
+  const cats={};gastosL.forEach(g=>{cats[g.cat]=(cats[g.cat]||0)+gTotal(g)});
   const catE=Object.entries(cats).sort((a,b)=>b[1]-a[1]),maxC=Math.max(1,...catE.map(c=>c[1]));
   const neg=rows.filter(r=>r.s.estado==='REVISAR STOCK').length;
-  const sinPrecio=S.filamentos.filter(f=>f.color&&f.material!=='OLD'&&!num(f.precio)).length;
+  const sinPrecio=S.filamentos.filter(f=>fHas(f)&&f.material!=='OLD'&&!num(f.precio)).length;
   const sinCoste=rows.filter(r=>r.p.tipo!=='Pack'&&num(r.p.precio)>0&&r.s.cu===0).length;
-  const mats=matList().map(m=>{const it=S.filamentos.filter(f=>f.material===m);return{m,n:it.reduce((a,f)=>a+num(f.gramos)/1000,0),v:it.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),a:it.filter(f=>f.color&&fEstado(f)[0]!=='ok').length}}).filter(x=>x.n||x.a);
-  const last=S.impresiones.slice().sort((a,b)=>(b.fecha+b.id).localeCompare(a.fecha+a.id)).slice(0,5);
-  return`<h2>Panel</h2><p class="sub">Resumen de ventas, gastos y stock. Se calcula solo con lo que apuntas en las demás pestañas.</p>
+  const mats=matList().map(m=>{const it=S.filamentos.filter(f=>f.material===m);return{m,n:it.reduce((a,f)=>a+num(f.gramos)/1000,0),v:it.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),a:it.filter(f=>fHas(f)&&fEstado(f)[0]!=='ok').length}}).filter(x=>x.n||x.a);
+  const last=S.impresiones.filter(i=>inR(i.fecha)).sort((a,b)=>(b.fecha+b.id).localeCompare(a.fecha+a.id)).slice(0,5);
+  const ppBar=`<div class="bar"><label style="display:flex;gap:8px;align-items:center;margin:0"><b>Periodo</b><select onchange="PP.k=this.value;render()" aria-label="Periodo">${Object.entries(PPL).map(([k,n])=>`<option value="${k}" ${PP.k===k?'selected':''}>${n}</option>`).join('')}</select></label>${PP.k==='rango'?`<label style="display:flex;gap:6px;align-items:center;margin:0">Desde <input type="date" value="${esc(PP.a)}" onchange="PP.a=this.value;render()"></label><label style="display:flex;gap:6px;align-items:center;margin:0">Hasta <input type="date" value="${esc(PP.b)}" onchange="PP.b=this.value;render()"></label>`:''}${rg?`<span class="chip info">◆ ${rg[0]==='0000-01-01'?'inicio':fdate(rg[0])} – ${rg[1]==='9999-12-31'?'hoy':fdate(rg[1])}</span>`:''}</div>`;
+  return`<h2>Panel</h2><p class="sub">${rg?`Cifras del periodo elegido. Ventas = pedidos Enviados o Cobrados con fecha en el periodo (${n0(nOrd)} pedido${nOrd===1?'':'s'}), con el coste que tenían ese día. Gastos y compras = los que tienen fecha en el periodo. Stock y avisos son de hoy.`:'Resumen de ventas, gastos y stock. Se calcula solo con lo que apuntas en las demás pestañas. Incluye lo vendido y fabricado antes de usar la app.'}</p>${ppBar}${rg&&sinFecha?`<p class="hint">${chip('low','REVISAR')} ${sinFecha} gasto(s) que descuentan no tienen fecha y no entran en este periodo: ponles fecha en Gastos.</p>`:''}${rg?`<p class="hint">Lo que vendiste o fabricaste antes de usar la app no tiene fecha y solo cuenta en "Todo".</p>`:''}
   <div class="kpis">
    <div class="kpi"><small>Ingresos por ventas</small><b>${eur(ingresos)}</b><em>${n0(unidades)} unidades vendidas</em></div>
-   <div class="kpi"><small>Beneficio de ventas</small><b>${eur(benef)}</b><em>Antes de gastos</em></div>
-   <div class="kpi"><small>Gastos descontados</small><b>${eur(gastosD)}</b><em>Los marcados "Descuenta: Sí"</em></div>
+   <div class="kpi"><small>Beneficio de ventas</small><b>${eur(benef)}</b><em>${rg?'Ventas − coste de lo vendido ('+eur(cvend)+')':'Antes de gastos'}</em></div>
+   <div class="kpi"><small>Gastos descontados</small><b>${eur(gastosD)}</b><em>Los marcados "Descuenta: Sí"${rg?' con fecha en el periodo':''}</em></div>
    <div class="kpi y"><small>Beneficio real</small><b class="${real<0?'neg':''}">${eur(real)}</b><em>${real>=0?chip('ok','EN BENEFICIO'):chip('low','EN PÉRDIDA (inversión sin recuperar)')}</em></div>
-   <div class="kpi"><small>Inversión recuperada</small><b>${pct(rec)}</b><em>${real>=0?'Ya recuperada':'Faltan '+eur(-real)+' para el equilibrio'}</em></div>
+   ${rg?`<div class="kpi"><small>Compras de filamento</small><b>${eur(comprasT)}</b><em>${comprasP.length} compra(s) en el periodo</em></div>`:`<div class="kpi"><small>Inversión recuperada</small><b>${pct(rec)}</b><em>${real>=0?'Ya recuperada':'Faltan '+eur(-real)+' para el equilibrio'}</em></div>`}
    <div class="kpi"><small>Valor stock de filamento</small><b>${eur(valor)}</b><em>${rl(rollos)} equivalentes</em></div>
    <div class="kpi"><small>Filamento a reponer</small><b>${alert.length}</b><em>Agotados: ${alert.filter(f=>fEstado(f)[0]==='out').length} · Bajos: ${alert.filter(f=>fEstado(f)[0]==='low').length}</em></div>
    <div class="kpi"><small>Pedidos pendientes</small><b>${pend}</b><em>Por cobrar (enviados): ${eur(porCobrar)}</em></div>
   </div>
   <div class="grid2">
    <section class="card dark"><h3>Filamento a reponer (agotado o en el mínimo)</h3>
-    ${alert.length?`<div class="tw"><table><tr><th class="l">Color / referencia</th><th>Material</th><th>Quedan</th><th>Estado</th></tr>${alert.slice(0,10).map(f=>{const[k,t]=fEstado(f);return`<tr><td class="l">${esc(f.color)}${f.marca?' · '+esc(f.marca):''}</td><td>${esc(f.material)}</td><td>${n0(f.gramos)} g</td><td>${chip(k,t)}</td></tr>`}).join('')}</table></div>${alert.length>10?`<p class="hint">… y ${alert.length-10} más (míralos en Filamento)</p>`:''}`:'<p>'+chip('ok','Sin alertas: todo en orden')+'</p>'}
+    ${alert.length?`<div class="tw"><table><tr><th class="l">Filamento</th><th>Material</th><th>Quedan</th><th>Estado</th></tr>${alert.slice(0,10).map(f=>{const[k,t]=fEstado(f);return`<tr><td class="l">${esc(fName(f))}${f.marca?' · '+esc(f.marca):''}</td><td>${esc(f.material)}</td><td>${n0(f.gramos)} g</td><td>${chip(k,t)}</td></tr>`}).join('')}</table></div>${alert.length>10?`<p class="hint">… y ${alert.length-10} más (míralos en Filamento)</p>`:''}`:'<p>'+chip('ok','Sin alertas: todo en orden')+'</p>'}
    </section>
-   <section class="card"><h3>Top 8 productos por beneficio</h3>
+   <section class="card"><h3>Top 8 productos por beneficio${rg?' (en el periodo)':''}</h3>
     ${top.map(r=>`<div class="hbar"><span class="n" title="${esc(r.p.nombre)}">${esc(r.p.nombre)}</span><span class="b"><i style="width:${Math.max(2,Math.abs(r.s.ben)/maxB*100)}%"></i></span><span class="v ${r.s.ben<0?'neg':''}">${eur(r.s.ben)}</span></div>`).join('')||'<p class="hint">Aún no hay productos.</p>'}
    </section>
   </div>
   <div class="grid2">
-   <section class="card"><h3>Gastos por categoría</h3>
+   <section class="card"><h3>Gastos por categoría${rg?' (en el periodo)':''}</h3>
     ${catE.map(([c,v])=>`<div class="hbar y"><span class="n">${esc(c)}</span><span class="b"><i style="width:${Math.max(2,v/maxC*100)}%"></i></span><span class="v">${eur(v)}</span></div>`).join('')||'<p class="hint">Sin gastos.</p>'}
     <p class="hint">Total: ${eur(gastosD)}</p>
    </section>
@@ -432,7 +481,7 @@ function vPanel(){
    </section>
   </div>
   <div class="grid2">
-   <section class="card"><h3>Últimas impresiones</h3>
+   <section class="card"><h3>${rg?'Impresiones del periodo':'Últimas impresiones'}</h3>
     ${last.map(i=>`<div class="sumrow"><span>${fdate(i.fecha)} · ${esc(impName(i))}</span><b>${n0(i.tandas)} tanda(s) · ${n0(i.consumo.reduce((a,c)=>a+num(c.g),0))} g</b></div>`).join('')||'<p class="hint">Todavía no has registrado ninguna. Ve a <a href="#imprimir">Imprimir</a>.</p>'}
    </section>
    <section class="card"><h3>Avisos de datos</h3>
@@ -481,7 +530,7 @@ function vImprimir(){
    </div>
   </div>
   <section class="card"><h3>Historial de impresiones</h3>
-   ${hist.map(i=>`<div class="hist"><div class="m"><b>${fdate(i.fecha)} · ${esc(impName(i))}</b><div class="hint">${n0(i.tandas)} tanda(s) · ${n0(i.buenas)} pieza(s) buena(s)${num(i.fallos)?' · '+n0(i.fallos)+' fallo(s)':''}${i.horas?' · '+n1(i.horas)+' h':''}${i.nota?' · '+esc(i.nota):''}</div><div>${i.consumo.map(c=>{const f=fil(c.fid);return`<span class="pill">${esc(f?f.color:'(filamento borrado)')}: ${n1(c.g)} g</span>`}).join('')}</div></div><div><button class="ico" onclick="pdUndo('${i.id}')">↩ Deshacer</button></div></div>`).join('')||'<p class="hint">Aún no hay impresiones registradas.</p>'}
+   ${hist.map(i=>`<div class="hist"><div class="m"><b>${fdate(i.fecha)} · ${esc(impName(i))}</b><div class="hint">${n0(i.tandas)} tanda(s) · ${n0(i.buenas)} pieza(s) buena(s)${num(i.fallos)?' · '+n0(i.fallos)+' fallo(s)':''}${i.horas?' · '+n1(i.horas)+' h':''}${i.nota?' · '+esc(i.nota):''}</div><div>${i.consumo.map(c=>{const f=fil(c.fid);return`<span class="pill">${esc(f?fName(f):'(filamento borrado)')}: ${n1(c.g)} g</span>`}).join('')}</div></div><div><button class="ico" onclick="pdUndo('${i.id}')">↩ Deshacer</button></div></div>`).join('')||'<p class="hint">Aún no hay impresiones registradas.</p>'}
   </section>`;
 }
 function pdProd(id){
@@ -506,7 +555,7 @@ function pdUpd(){
   const lines=Object.entries(t.agg).map(([id,g])=>{
     const f=fil(id),after=num(f.gramos)-g;
     let ch=after<0?chip('out','SIN STOCK SUFICIENTE'):(num(f.minimo)>0&&after<=num(f.minimo)*1000)?chip('low','QUEDARÁ BAJO'):'';
-    return`<div class="sumrow"><span>${esc(f.color)}</span><b>${n0(f.gramos)} → <span class="${after<0?'neg':''}">${n0(after)} g</span> ${ch}</b></div>`;
+    return`<div class="sumrow"><span>${esc(fName(f))}</span><b>${n0(f.gramos)} → <span class="${after<0?'neg':''}">${n0(after)} g</span> ${ch}</b></div>`;
   }).join('');
   el.innerHTML=`<div class="sumrow"><span>Piezas buenas</span><b>${n0(num(PD.tandas))} × ${n0(num(PD.piezas))} − ${n0(num(PD.fallos))} = ${n0(t.buenas)}</b></div>
    <div class="sumrow"><span>Filamento total a restar</span><b>${n1(t.g)} g</b></div>
@@ -525,14 +574,14 @@ function pdRegister(){
     S.impresiones.push({id:uid('i'),fecha:PD.fecha||today(),productoId:PD.productoId||null,etiqueta:PD.etiqueta||'',tandas:t.T,piezas:num(PD.piezas),fallos:num(PD.fallos),buenas:t.buenas,horas:num(PD.horas)?num(PD.horas)*t.T:0,nota:PD.nota,costePlastico:t.cost,consumo:Object.entries(t.agg).map(([fid,g])=>({fid,g:Math.round(g*10)/10}))});
     save();const fecha=PD.fecha;PD=newDraft();PD.fecha=fecha;toast('✔ Impresión registrada y filamento restado');render();
   };
-  if(short.length)ask('Stock insuficiente',`<p>No hay gramos suficientes de:</p><ul>${short.map(([id,g])=>`<li>${esc(fil(id).color)}: hay ${n0(fil(id).gramos)} g y se restan ${n0(g)} g</li>`).join('')}</ul><p>Si continúas, el stock quedará en negativo. Revisa el recuento del rollo.</p>`,go_,'Registrar igualmente');
+  if(short.length)ask('Stock insuficiente',`<p>No hay gramos suficientes de:</p><ul>${short.map(([id,g])=>`<li>${esc(fName(fil(id)))}: hay ${n0(fil(id).gramos)} g y se restan ${n0(g)} g</li>`).join('')}</ul><p>Si continúas, el stock quedará en negativo. Revisa el recuento del rollo.</p>`,go_,'Registrar igualmente');
   else go_();
 }
 function pdUndo(id){
   const i=S.impresiones.find(x=>x.id===id);if(!i)return;
   ask('Deshacer impresión',`<p>Se borrará esta impresión (${fdate(i.fecha)} · ${esc(impName(i))}) y se devolverán al stock los gramos restados.</p>`,()=>{
-    i.consumo.forEach(c=>{const f=fil(c.fid);if(f)f.gramos=Math.round((num(f.gramos)+num(c.g))*10)/10});
-    S.impresiones=S.impresiones.filter(x=>x.id!==id);save();toast('Impresión deshecha');render();
+    const sn=snapU();i.consumo.forEach(c=>{const f=fil(c.fid);if(f)f.gramos=Math.round((num(f.gramos)+num(c.g))*10)/10});
+    S.impresiones=S.impresiones.filter(x=>x.id!==id);save();toastU('Impresión deshecha.',sn);render();
   },'Deshacer');
 }
 /* lectura de .3mf de Bambu Studio (zip sin librerías) */
@@ -663,9 +712,9 @@ function saveProd(id){
   save();closeModal();toast('Producto guardado');render();
 }
 function delProd(id){
-  const p=prod(id),n=S.pedidos.filter(o=>o.producto===id).length+S.impresiones.filter(i=>i.productoId===id).length;
+  const p=prod(id),n=S.pedidos.filter(o=>(o.lineas||[]).some(l=>l.producto===id)).length+S.impresiones.filter(i=>i.productoId===id).length;
   ask('Borrar producto',`<p>Se borrará <b>${esc(p.nombre)}</b>${n?`. Tiene ${n} pedido(s)/impresión(es) asociados que quedarán sin producto (los gramos ya restados no se devuelven).`:'.'}</p>`,()=>{
-    S.productos=S.productos.filter(x=>x.id!==id);S.productos.forEach(q=>{if(q.base===id)q.base=''});save();toast('Producto borrado');render();
+    const sn=snapU();S.productos=S.productos.filter(x=>x.id!==id);S.productos.forEach(q=>{if(q.base===id)q.base=''});save();toastU('Producto borrado.',sn);render();
   },'Borrar');
 }
 
@@ -684,75 +733,127 @@ function vPedidos(){
    <div class="kpi y"><small>Beneficio contabilizado</small><b>${eur(sum(cont,o=>oTotal(o)-oCoste(o)))}</b><em>Enviado + Cobrado</em></div></div>
   <div class="bar"><button class="btn blue" onclick="openPedido('')">+ Nuevo pedido</button><span class="sp"></span>
    <label style="display:flex;gap:6px;align-items:center">Estado<select onchange="PEF=this.value;render()" style="margin:0;width:auto">${opts([['','Todos'],...ESTADOS],PEF)}</select></label></div>`;
-  if(isMob())return top+(os.map(o=>{const p=prod(o.producto);return`<div class="lcard ${o.estado==='Cancelado'?'cancel':''}"><div class="lr"><b>${esc(o.cliente||'(sin cliente)')}</b>${chip(ec[o.estado]||'neu',o.estado)}</div><div class="hint">${fdate(o.fecha)} · ${p?esc(p.nombre):'(producto borrado)'}</div><div class="kv"><span>Cant. <b>${n0(o.cant)}</b></span>${num(o.desc)?`<span>Dto. <b>${n0(o.desc)}%</b></span>`:''}<span>Total <b>${eur(oTotal(o))}</b></span><span>Benef. <b>${eur(oTotal(o)-oCoste(o))}</b></span></div><div class="lr"><span></span><button class="ico" onclick="openPedido('${o.id}')">Editar</button></div></div>`}).join('')||'<p class="hint">Sin pedidos.</p>');
-  return top+`<div class="tw"><table><tr><th>Fecha</th><th class="l">Cliente</th><th class="l">Producto</th><th>Cant.</th><th>Dto.</th><th>Total</th><th>Coste</th><th>Beneficio</th><th>Estado</th><th></th></tr>
-  ${os.map(o=>{const p=prod(o.producto);return`<tr class="${o.estado==='Cancelado'?'cancel':''}"><td>${fdate(o.fecha)}</td><td class="l">${esc(o.cliente)}</td><td class="l">${p?esc(p.nombre):'<span class="neg">(producto borrado)</span>'}</td><td>${n0(o.cant)}</td><td>${num(o.desc)?n0(o.desc)+'%':'–'}</td><td>${eur(oTotal(o))}</td><td>${eur(oCoste(o))}</td><td>${eur(oTotal(o)-oCoste(o))}</td><td>${chip(ec[o.estado]||'neu',o.estado)}</td><td><button class="ico" onclick="openPedido('${o.id}')">Editar</button></td></tr>`}).join('')||'<tr><td colspan="10" class="hint">Sin pedidos.</td></tr>'}</table></div>`;
+  if(isMob())return top+(os.map(o=>`<div class="lcard ${o.estado==='Cancelado'?'cancel':''}"><div class="lr"><b>${esc(o.cliente||'(sin cliente)')}</b>${chip(ec[o.estado]||'neu',o.estado)}</div><div class="hint">${fdate(o.fecha)}</div><div style="margin:4px 0">${oProds(o).map(x=>`<div>${x}</div>`).join('')||'<span class="hint">sin productos</span>'}</div><div class="kv"><span>Uds. <b>${n0(oUds(o))}</b></span><span>Total <b>${eur(oTotal(o))}</b></span><span>Benef. <b>${eur(oTotal(o)-oCoste(o))}</b></span></div><div class="lr"><span></span><button class="ico" onclick="openPedido('${o.id}')">Editar</button></div></div>`).join('')||'<p class="hint">Sin pedidos.</p>');
+  return top+`<div class="tw"><table><tr><th>Fecha</th><th class="l">Cliente</th><th class="l">Productos</th><th>Uds.</th><th>Total</th><th>Coste</th><th>Beneficio</th><th>Estado</th><th></th></tr>
+  ${os.map(o=>`<tr class="${o.estado==='Cancelado'?'cancel':''}"><td>${fdate(o.fecha)}</td><td class="l">${esc(o.cliente)}</td><td class="l" style="white-space:normal">${oProds(o).join('<br>')||'<span class="hint">sin productos</span>'}</td><td>${n0(oUds(o))}</td><td>${eur(oTotal(o))}</td><td>${eur(oCoste(o))}</td><td>${eur(oTotal(o)-oCoste(o))}</td><td>${chip(ec[o.estado]||'neu',o.estado)}</td><td><button class="ico" onclick="openPedido('${o.id}')">Editar</button></td></tr>`).join('')||'<tr><td colspan="9" class="hint">Sin pedidos.</td></tr>'}</table></div>`;
 }
+let OD=null;
+const odLine=()=>({producto:'',cant:1,precio:'',desc:0});
 function openPedido(id){
-  const o=id?S.pedidos.find(x=>x.id===id):{fecha:today(),cliente:'',producto:'',cant:1,desc:0,estado:'Pendiente',notas:''};
-  modal(id?'Editar pedido':'Nuevo pedido',`<form id="mform" onsubmit="return false"><div class="fg">
-   <label>Fecha<input type="date" name="fecha" value="${esc(o.fecha)}"></label>
-   <label>Cliente<input name="cliente" value="${esc(o.cliente)}"></label>
-   <label class="w2">Producto<select name="producto">${opts([['','— elige —'],...S.productos.map(p=>[p.id,p.nombre])],o.producto)}</select></label>
-   <label>Cantidad<input type="number" name="cant" min="1" step="1" value="${esc(o.cant)}"></label>
-   <label>Descuento (%)<input type="number" name="desc" min="0" max="100" step="any" value="${esc(o.desc)}"></label>
-   <label>Estado<select name="estado">${opts(ESTADOS,o.estado)}</select></label>
-   <label class="wall">Notas<input name="notas" value="${esc(o.notas||'')}"></label></div></form>`,()=>{
-    const n={fecha:fv('fecha'),cliente:fv('cliente').trim(),producto:fv('producto'),cant:num(fv('cant')),desc:Math.min(100,Math.max(0,num(fv('desc')))),estado:fv('estado'),notas:fv('notas')};
-    if(!n.producto||n.cant<=0){toast('Elige producto y cantidad');return}
-    if(id)Object.assign(o,n);else S.pedidos.push(Object.assign({id:uid('o')},n));
-    save();closeModal();render();
-  },{extra:id?`<button class="btn warn" onclick="delPedido('${id}')">Borrar</button>`:''});
+  const o=id?S.pedidos.find(x=>x.id===id):null;
+  OD=o?{id,fecha:o.fecha,cliente:o.cliente,estado:o.estado,notas:o.notas||'',lineas:(o.lineas||[]).map(l=>({...l}))}:{id:'',fecha:today(),cliente:'',estado:'Pendiente',notas:'',lineas:[odLine()]};
+  if(!OD.lineas.length)OD.lineas=[odLine()];
+  modal(id?'Editar pedido':'Nuevo pedido','<form id="mform" onsubmit="return false"><div id="odbody"></div></form>',odSave,{extra:id?`<button class="btn warn" onclick="delPedido('${id}')">Borrar</button>`:''});
+  odRender();
 }
-function delPedido(id){ask('Borrar pedido','<p>Se borrará el pedido.</p>',()=>{S.pedidos=S.pedidos.filter(o=>o.id!==id);save();render()},'Borrar')}
+function odRender(){
+  const el=document.getElementById('odbody');if(!el)return;
+  el.innerHTML=`<div class="fg"><label>Fecha<input type="date" value="${esc(OD.fecha)}" onchange="OD.fecha=this.value"></label>
+   <label>Cliente<input value="${esc(OD.cliente)}" onchange="OD.cliente=this.value"></label>
+   <label>Estado<select onchange="OD.estado=this.value">${opts(ESTADOS,OD.estado)}</select></label>
+   <label>Notas<input value="${esc(OD.notas)}" onchange="OD.notas=this.value"></label></div>
+   <h3 style="margin:14px 0 8px">Productos del pedido</h3>`+OD.lineas.map((l,i)=>{const p=l.producto?prod(l.producto):null;
+   return`<div class="cpl"><div class="lr"><b>Línea ${i+1}</b>${OD.lineas.length>1?`<button type="button" class="ico" onclick="odDel(${i})">✕ Quitar</button>`:''}</div>
+    <label>Producto<select onchange="odSel(${i},this.value)">${opts([['','— elige —'],...S.productos.map(q=>[q.id,q.nombre])],l.producto)}</select></label>
+    <div class="fg"><label>Cantidad<input type="number" min="1" step="1" value="${esc(l.cant)}" oninput="OD.lineas[${i}].cant=this.value;odTot()"></label>
+     <label>Precio ud. (€)<input type="number" min="0" step="0.01" value="${esc(l.precio)}" oninput="OD.lineas[${i}].precio=this.value;odTot()"></label>
+     <label>Descuento (%)<input type="number" min="0" max="100" step="any" value="${esc(l.desc)}" oninput="OD.lineas[${i}].desc=this.value;odTot()"></label></div>
+    ${p?((l.coste!=null&&l.coste!=='')?`<p class="hint">Coste por unidad guardado: <b>${eur(num(l.coste))}</b> (el de ese día; no cambia si luego sube el filamento). <button type="button" class="ico" onclick="OD.lineas[${i}].coste=null;odRender()">Actualizar al coste de hoy (${eur(costeUsado(p))})</button></p>`:`<p class="hint">Coste por unidad ahora: ${eur(costeUsado(p))}. Se guardará fijo cuando el pedido pase a Enviado o Cobrado.</p>`):''}</div>`}).join('')+
+   `<button type="button" class="btn ghost" onclick="OD.lineas.push(odLine());odRender()">+ Añadir otro producto</button><p id="odtot" style="margin-top:12px"></p>
+   <p class="hint">Solo los pedidos Enviados o Cobrados suman a Vendidos y restan stock. El precio y el coste de cada línea se guardan en el pedido: si cambias luego el precio o el coste del producto, los pedidos antiguos no cambian.</p>`;
+  odTot();
+}
+function odSel(i,v){const l=OD.lineas[i];l.producto=v;l.coste=null;const p=prod(v);if(p)l.precio=num(p.precio);odRender()}
+function odDel(i){OD.lineas.splice(i,1);odRender()}
+function odTot(){const e=document.getElementById('odtot');if(!e)return;const t=OD.lineas.reduce((a,l)=>a+lTot(l),0),c=OD.lineas.reduce((a,l)=>a+lCoste(l),0);
+  e.innerHTML=`Total: <b>${eur(t)}</b> · Coste: ${eur(c)} · Beneficio: <b>${eur(t-c)}</b>`}
+function odSave(){
+  for(const l of OD.lineas){if(!l.producto){toast('Elige un producto en cada línea (o quita la línea vacía)');return}if(!(num(l.cant)>0)){toast('Pon la cantidad de cada producto');return}}
+  const n={fecha:OD.fecha||today(),cliente:String(OD.cliente).trim(),estado:OD.estado,notas:OD.notas,lineas:OD.lineas.map(l=>{const p=prod(l.producto),sold=OD.estado==='Enviado'||OD.estado==='Cobrado';return{producto:l.producto,cant:num(l.cant),precio:l.precio===''?num((p||{}).precio):num(l.precio),desc:Math.min(100,Math.max(0,num(l.desc))),coste:sold?((l.coste!=null&&l.coste!=='')?num(l.coste):(p?costeUsado(p):0)):null}})};
+  if(OD.id){Object.assign(S.pedidos.find(x=>x.id===OD.id),n)}else S.pedidos.push(Object.assign({id:uid('o')},n));
+  save();closeModal();render();
+}
+function delPedido(id){ask('Borrar pedido','<p>Se borrará el pedido.</p>',()=>{const sn=snapU();S.pedidos=S.pedidos.filter(o=>o.id!==id);save();toastU('Pedido borrado.',sn);render()},'Borrar')}
 
 /* ---------- FILAMENTO ---------- */
+let FSEL=new Set(),FSM=false;
 let FMAT='',FALERT=false,FMARCA='',FTAG='',FT=[];
 const tagList=()=>{const s=new Set(TIPOS);S.filamentos.forEach(f=>(f.etiquetas||[]).forEach(t=>s.add(t)));return[...s].sort((a,b)=>a.localeCompare(b,'es'))};
 const marcaList=()=>[...new Set(S.filamentos.map(f=>f.marca).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+const marcaOpts=sel=>`<option value="">Sin marca</option>`+marcaList().map(m=>`<option value="${esc(m)}" ${m===sel?'selected':''}>${esc(m)}</option>`).join('')+`<option value="__otra">➕ Otra marca…</option>`;
 const tagChips=f=>(f.etiquetas||[]).map(t=>`<span class="tg">${esc(t)}</span>`).join(' ');
 function fClear(){FMAT='';FMARCA='';FTAG='';FALERT=false;render()}
+let FSORT={k:'',d:0};
+const FCOLS={tags:['Etiquetas','t'],marca:['Marca','t'],color:['Color','t'],ref:['Referencia','t'],rest:['Restante','n'],comp:['Total comprado','n'],min:['Mínimo','n'],precio:['Precio rollo','n'],valor:['Valor stock','n'],estado:['Estado','t']};
+function fVal(f,k){switch(k){case'tags':return(f.etiquetas||[]).join(', ');case'marca':return f.marca||'';case'color':return f.color||'';case'ref':return f.ref||'';case'rest':return num(f.gramos);case'comp':return num(f.comprados);case'min':return num(f.minimo);case'precio':return num(f.precio);case'valor':return num(f.gramos)/1000*num(f.precio);case'estado':return fEstado(f)[1]}return''}
+function fSort(k){FSORT=FSORT.k!==k?{k,d:1}:FSORT.d===1?{k,d:2}:{k:'',d:0};render()}
+function fSortSet(v){const[k,d]=v.split(':');FSORT=k?{k,d:+d}:{k:'',d:0};render()}
+const fAsc=()=>FCOLS[FSORT.k][1]==='n'?FSORT.d===2:FSORT.d===1;
+function fSorted(it){
+  if(!FSORT.k)return it;const k=FSORT.k,isN=FCOLS[k][1]==='n',asc=fAsc();
+  return it.map((f,i)=>[f,i]).sort((A,B)=>{const a=fVal(A[0],k),b=fVal(B[0],k),ea=a===''||a==null,eb=b===''||b==null;if(ea!==eb)return ea?1:-1;let c=isN?a-b:String(a).localeCompare(String(b),'es',{numeric:true,sensitivity:'base'});if(!asc)c=-c;return c||A[1]-B[1]}).map(x=>x[0]);
+}
+function fSortTxt(){if(!FSORT.k)return'';const isN=FCOLS[FSORT.k][1]==='n';return FCOLS[FSORT.k][0]+': '+(isN?(fAsc()?'de menos a más':'de más a menos'):(fAsc()?'A → Z':'Z → A'))}
 function vFilamento(){
   const list=S.filamentos.filter(f=>(!FMAT||f.material===FMAT)&&(!FMARCA||(FMARCA==='__none'?!f.marca:f.marca===FMARCA))&&(!FTAG||(f.etiquetas||[]).includes(FTAG))&&(!FALERT||fEstado(f)[0]!=='ok'));
   const valor=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),g=S.filamentos.reduce((a,f)=>a+num(f.gramos),0);
-  const mob=isMob();let h='';
+  FSEL=new Set([...FSEL].filter(id=>list.some(f=>f.id===id)));
+  const mob=isMob();let h='';const NC=FSM?12:11;
+  const cb=f=>FSM?`<input type="checkbox" class="selc" aria-label="Seleccionar ${esc(fName(f))}" ${FSEL.has(f.id)?'checked':''} onchange="fselTog('${f.id}')">`:'';
+  const th=(k,cls)=>{const on=FSORT.k===k,isN=FCOLS[k][1]==='n',ar=on?(fAsc()?' ▲':' ▼'):'';
+    return`<th class="${cls||''}" aria-sort="${on?(fAsc()?'ascending':'descending'):'none'}"><button type="button" class="thb" onclick="fSort('${k}')" title="Ordenar por ${FCOLS[k][0].toLowerCase()}: ${isN?'de más a menos':'A → Z'}, al revés, y orden original">${FCOLS[k][0]}${ar}</button></th>`};
   matList().forEach(m=>{
-    const it=list.filter(f=>f.material===m);if(!it.length)return;
-    h+=mob?`<div class="mband">${esc(m)}</div>`:`<tr class="band"><td colspan="10">${esc(m)}</td></tr>`;
-    it.forEach(f=>{const[k,t]=fEstado(f),ref=num(f.minimo)>0?num(f.minimo)*2000:1000,w=Math.max(0,Math.min(100,num(f.gramos)/ref*100));
-      const q=esc((f.color+' '+f.marca+' '+(f.etiquetas||[]).join(' ')+' '+f.material).toLowerCase());
-      h+=mob?`<div class="lcard fcard" data-q="${q}"><div class="fhead" style="background:${esc(fHex(f)||'#3a3a44')}"><b class="fn">${esc(f.color)}</b><span class="fc">${fColName(f)}</span></div><div class="fbody"><div class="lr"><span class="hint">${f.marca?esc(f.marca):'Sin marca'} ${tagChips(f)}</span>${chip(k,t)}</div>
-        <div style="margin:8px 0"><span class="meter ${k==='ok'?'':k}"><i style="width:${w}%"></i></span><b>${n0(f.gramos)} g</b> <span class="hint">(${rl(num(f.gramos)/1000)})</span></div>
-        <div class="lr"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div></div>`
-      :`<tr data-q="${q}"><td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:230px"><div class="cband" style="background:${esc(fHex(f)||'#3a3a44')}"><b>${esc(f.color)}</b><span>${fColName(f)}</span></div></td>
-      <td class="l"><span class="meter ${k==='ok'?'':k}"><i style="width:${w}%"></i></span>${n0(f.gramos)} g <span class="hint">(${rl(num(f.gramos)/1000)})</span></td>
+    const it=fSorted(list.filter(f=>f.material===m));if(!it.length)return;
+    h+=mob?`<div class="mband">${esc(m)}</div>`:`<tr class="band"><td colspan="${NC}">${esc(m)}</td></tr>`;
+    it.forEach(f=>{const[k,t]=fEstado(f);
+      const q=esc((fName(f)+' '+f.marca+' '+(f.etiquetas||[]).join(' ')+' '+f.material).toLowerCase());
+      h+=mob?`<div class="lcard ${FSEL.has(f.id)?'selected':''}" data-q="${q}" data-id="${f.id}"><div class="lr"><div class="cnm">${cb(f)}${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${f.ref?'Ref. '+esc(f.ref)+' · ':''}${fColName(f)} · ${f.marca?esc(f.marca):'Sin marca'}</span></span></div>${chip(k,t)}</div>
+        <div style="margin-top:6px">${tagChips(f)||'<span class="hint">sin etiquetas</span>'}</div>
+        <div class="rst" style="margin:8px 0"><b>${rl(num(f.gramos)/1000)}</b><span class="hint">${n0(f.gramos)} g</span></div>
+        <div class="lr"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div>`
+      :`<tr data-q="${q}" data-id="${f.id}" class="${FSEL.has(f.id)?'selected':''}">${FSM?`<td>${cb(f)}</td>`:''}<td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:170px"><div class="cnm">${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${fColName(f)}</span></span></div></td><td class="l">${f.ref?esc(f.ref):'<span class="hint">–</span>'}</td>
+      <td class="l"><div class="rst"><b>${rl(num(f.gramos)/1000)}</b><span class="hint">${n0(f.gramos)} g</span></div></td>
       <td>${num(f.comprados)}</td><td>${num(f.minimo)||'–'}</td><td>${num(f.precio)?eur(f.precio):'<span class="hint">sin precio</span>'}</td><td>${eur(num(f.gramos)/1000*num(f.precio))}</td><td>${chip(k,t)}</td>
       <td style="white-space:nowrap"><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" title="Añadir un rollo nuevo (+1000 g)" onclick="filPlus('${f.id}')">+1 rollo</button></td></tr>`});
   });
+  const sortSel=`<select onchange="fSortSet(this.value)" style="width:100%" aria-label="Ordenar"><option value="">Orden: original</option>${Object.entries(FCOLS).map(([k,[n,ty]])=>ty==='n'?`<option value="${k}:1" ${FSORT.k===k&&FSORT.d===1?'selected':''}>${n}: de más a menos</option><option value="${k}:2" ${FSORT.k===k&&FSORT.d===2?'selected':''}>${n}: de menos a más</option>`:`<option value="${k}:1" ${FSORT.k===k&&FSORT.d===1?'selected':''}>${n}: A → Z</option><option value="${k}:2" ${FSORT.k===k&&FSORT.d===2?'selected':''}>${n}: Z → A</option>`).join('')}</select>`;
   return`<h2>Filamento</h2><p class="sub">El stock se guarda en <b>gramos</b>. Cada impresión registrada en Imprimir resta de aquí. Cuando compres filamento, pulsa "Registrar compra": suma los rollos al stock y guarda el historial. "+1 rollo" es el atajo para sumar uno solo (1.000 g). Todos tus rollos actuales se han convertido a 1.000 g cada uno; si alguno está empezado, ajústalo con Editar.</p>
-  <div class="bar"><button class="btn blue" onclick="openCompra()">🛒 Registrar compra</button><button class="btn ghost" onclick="openFil('')">+ Nuevo filamento</button>
-   <input type="search" placeholder="Buscar color, marca…" oninput="fSearch(this.value)" style="width:${mob?'100%':'200px'}">
+  <div class="bar"><button class="btn blue" onclick="openCompra()">🛒 Registrar compra</button><button class="btn ghost" onclick="openFil('')">+ Nuevo filamento</button><button class="btn ${FSM?'':'ghost'}" onclick="fselMode()">${FSM?'✕ Salir de selección':'☑ Seleccionar'}</button>
+   <input type="search" placeholder="Buscar color, referencia, marca…" oninput="fSearch(this.value)" style="width:${mob?'100%':'230px'}">
    <select onchange="FMARCA=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Marca"><option value="">Marca: todas</option>${marcaList().map(m=>`<option ${FMARCA===m?'selected':''}>${esc(m)}</option>`).join('')}<option value="__none" ${FMARCA==='__none'?'selected':''}>Sin marca</option></select>
    <select onchange="FTAG=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Etiqueta"><option value="">Etiqueta: todas</option>${tagList().map(m=>`<option ${FTAG===m?'selected':''}>${esc(m)}</option>`).join('')}</select>
+   ${mob?sortSel:''}
    ${(FMAT||FMARCA||FTAG||FALERT)?`<button class="btn ghost" onclick="fClear()">✕ Quitar filtros</button>`:''}
    <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FALERT?'checked':''} onchange="FALERT=this.checked;render()" style="width:auto;min-height:0"> Solo alertas</label>
-   <span class="sp"></span>${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
+  </div>
+  <div class="bar" style="flex-wrap:nowrap;overflow-x:auto">${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" style="flex:0 0 auto" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
   ${mob?h+`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${n0(g)} g · ${eur(valor)}</b></div></div>`
-  :`<div class="tw"><table><tr><th>Etiquetas</th><th>Marca</th><th class="l">Color / referencia</th><th class="l">Restante</th><th>Total comprado</th><th>Mínimo</th><th>Precio rollo</th><th>Valor stock</th><th>Estado</th><th></th></tr>${h||'<tr><td colspan="10" class="hint">Sin resultados.</td></tr>'}
-  <tr class="tot"><td colspan="3" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
-  ${cpHist()}<p class="hint">Mostrando ${list.length} de ${S.filamentos.length} filamentos${(FMAT||FMARCA||FTAG||FALERT)?' (con filtros)':''}.</p><p class="hint">Barra: llena = tienes al menos el doble de tu mínimo (o 1 rollo, si no has puesto mínimo); a la mitad = estás justo en el mínimo. No depende de lo que hayas comprado en total.</p><p class="legend">Estados: ● OK · ▲ BAJO (en el mínimo o por debajo) · ✖ AGOTADO (0 g).</p>`;
+  :`<div class="tw"><table><tr>${FSM?'<th><input type="checkbox" class="selc" id="selall" title="Seleccionar todos los visibles" aria-label="Seleccionar todos los visibles" onchange="fselAll(this.checked)"></th>':''}${th('tags')}${th('marca')}${th('color','l')}${th('ref','l')}${th('rest','l')}${th('comp')}${th('min')}${th('precio')}${th('valor')}${th('estado')}<th></th></tr>${h||`<tr><td colspan="${NC}" class="hint">Sin resultados.</td></tr>`}
+  <tr class="tot"><td colspan="${FSM?5:4}" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
+  ${FSM?fselBar(list.length):''}${cpHist()}<p class="hint">Mostrando ${list.length} de ${S.filamentos.length} filamentos${(FMAT||FMARCA||FTAG||FALERT)?' (con filtros)':''}.${FSORT.k?' Orden: '+fSortTxt()+'.':''}${mob?'':' Pulsa el título de una columna para ordenar: 1ª vez A → Z (o de más a menos), 2ª al revés, 3ª vuelve al orden original.'}</p><p class="legend">Estados: ● OK · ▲ BAJO (en el mínimo o por debajo) · ✖ AGOTADO (0 g).</p>`;
 }
-function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{r.style.display=r.dataset.q.includes(v)?'':'none'})}
+function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{const show=r.dataset.q.includes(v);r.style.display=show?'':'none';if(!show&&r.dataset.id&&FSEL.has(r.dataset.id)){FSEL.delete(r.dataset.id);const c=r.querySelector('.selc');if(c)c.checked=false;r.classList.remove('selected')}});fselUpd()}
+function fselMode(){FSM=!FSM;FSEL.clear();render()}
+function fselBar(n){return`<div class="selbar" id="selbar"><b id="selcount"></b><span class="sp"></span><button class="btn ghost" onclick="fselAll(true)">Todos</button><button class="btn ghost" onclick="fselAll(false)">Ninguno</button><button class="btn warn" id="seldel" onclick="fDelMany()">🗑 Borrar</button></div><div style="height:96px"></div>`}
+function fselUpd(){const c=document.getElementById('selcount');if(c)c.textContent=FSEL.size+(FSEL.size===1?' seleccionado':' seleccionados');const d=document.getElementById('seldel');if(d)d.disabled=!FSEL.size;
+  const vis=[...document.querySelectorAll('[data-id]')].filter(r=>r.style.display!=='none'),a=document.getElementById('selall');if(a){a.checked=vis.length>0&&vis.every(r=>FSEL.has(r.dataset.id))}}
+function fselTog(id){if(FSEL.has(id))FSEL.delete(id);else FSEL.add(id);const r=document.querySelector('[data-id="'+id+'"]');if(r)r.classList.toggle('selected',FSEL.has(id));fselUpd()}
+function fselAll(on){document.querySelectorAll('[data-id]').forEach(r=>{if(r.style.display==='none')return;const id=r.dataset.id;if(on)FSEL.add(id);else FSEL.delete(id);r.classList.toggle('selected',on);const c=r.querySelector('.selc');if(c)c.checked=on});fselUpd()}
+function rmFils(ids){const set=new Set(ids);S.filamentos=S.filamentos.filter(x=>!set.has(x.id));S.productos.forEach(p=>{if(p.ficha&&p.ficha.fils)p.ficha.fils=p.ficha.fils.filter(x=>!set.has(x.fid))})}
+function fDelMany(){
+  const ids=[...FSEL];if(!ids.length)return;const set=new Set(ids),fs=ids.map(fil).filter(Boolean);
+  const nProd=S.productos.filter(p=>p.ficha&&(p.ficha.fils||[]).some(x=>set.has(x.fid))).length,nImp=S.impresiones.filter(i=>(i.consumo||[]).some(c=>set.has(c.fid))).length,g=fs.reduce((a,f)=>a+num(f.gramos),0);
+  ask('Borrar '+fs.length+(fs.length===1?' filamento':' filamentos'),`<p>Se borrarán <b>${fs.length}</b> filamentos (${n0(g)} g de stock):</p><ul style="margin:6px 0 10px 18px">${fs.slice(0,10).map(f=>`<li>${esc(fName(f))}${f.marca?' · '+esc(f.marca):''}</li>`).join('')}${fs.length>10?`<li>…y ${fs.length-10} más</li>`:''}</ul>${nProd?`<p>${nProd} producto(s) los usan en su ficha: se quitarán de la receta y su coste calculado cambiará.</p>`:''}${nImp?`<p>${nImp} impresión(es) del historial los usan y los mostrarán como borrados.</p>`:''}<p class="hint">Tendrás unos segundos para pulsar "Deshacer".</p>`,()=>{const sn=snapU();rmFils(ids);FSEL.clear();FSM=false;save();toastU(fs.length+' filamentos borrados.',sn);render()},'Borrar '+fs.length)}
 
 /* ---------- compras de filamento ---------- */
 let CP=null;
-const cpNewLine=()=>({fid:'',rollos:1,precio:'',material:FMAT||'PLA',marca:'',color:''});
+const cpNewLine=()=>({fid:'',rollos:1,precio:'',material:FMAT||'PLA',marca:'',color:'',ref:''});
 function openCompra(){
   CP={fecha:today(),nota:'',lineas:[cpNewLine()]};
   modal('🛒 Registrar compra de filamento','<form id="mform" onsubmit="return false"><div id="cpbody"></div></form>',cpSave,{saveText:'Añadir al stock'});
   cpRender();
 }
-function cpOpts(sel){return`<option value="">Elige filamento…</option><option value="__new" ${sel==='__new'?'selected':''}>➕ Filamento nuevo…</option>`+matList().map(m=>{const it=S.filamentos.filter(f=>f.material===m);return it.length?`<optgroup label="${esc(m)}">`+it.map(f=>`<option value="${f.id}" ${f.id===sel?'selected':''}>${esc(f.color)}${f.marca?' · '+esc(f.marca):''}</option>`).join('')+'</optgroup>':''}).join('')}
+function cpOpts(sel){return`<option value="">Elige filamento…</option><option value="__new" ${sel==='__new'?'selected':''}>➕ Filamento nuevo…</option>`+matList().map(m=>{const it=S.filamentos.filter(f=>f.material===m);return it.length?`<optgroup label="${esc(m)}">`+it.map(f=>`<option value="${f.id}" ${f.id===sel?'selected':''}>${esc(fName(f))}${f.marca?' · '+esc(f.marca):''}</option>`).join('')+'</optgroup>':''}).join('')}
 function cpRender(){
   const el=document.getElementById('cpbody');if(!el)return;
   el.innerHTML=`<div class="fg"><label>Fecha<input type="date" value="${esc(CP.fecha)}" onchange="CP.fecha=this.value"></label>
@@ -762,8 +863,9 @@ function cpRender(){
     return`<div class="cpl"><div class="lr"><b>Línea ${i+1}</b>${CP.lineas.length>1?`<button type="button" class="ico" onclick="cpDel(${i})">✕ Quitar</button>`:''}</div>
      <label>Filamento<select onchange="cpSel(${i},this.value)">${cpOpts(l.fid)}</select></label>
      ${l.fid==='__new'?`<div class="fg"><label>Material<select onchange="CP.lineas[${i}].material=this.value">${opts(matList(),l.material)}</select></label>
-       <label>Marca<input value="${esc(l.marca)}" onchange="CP.lineas[${i}].marca=this.value" placeholder="Bambu Lab"></label>
-       <label class="w2">Color / referencia<input value="${esc(l.color)}" onchange="CP.lineas[${i}].color=this.value" placeholder="Ej. ROJO 10200"></label></div>`:''}
+       <label>Marca<select onchange="CP.lineas[${i}].marca=this.value;cpRender()">${marcaOpts(l.marca)}</select>${l.marca==='__otra'?`<input value="${esc(l.marcaNueva||'')}" onchange="CP.lineas[${i}].marcaNueva=this.value" placeholder="Nombre de la marca" style="margin-top:6px">`:''}</label>
+       <label>Color<input value="${esc(l.color)}" onchange="CP.lineas[${i}].color=this.value" placeholder="Ej. ROJO"></label>
+       <label>Referencia / código<input value="${esc(l.ref||'')}" onchange="CP.lineas[${i}].ref=this.value" placeholder="Ej. 10200"></label></div>`:''}
      <div class="fg"><label>Rollos<input type="number" min="1" step="1" value="${esc(l.rollos)}" oninput="CP.lineas[${i}].rollos=this.value;cpTot()"></label>
       <label>Precio por rollo (€)<input type="number" min="0" step="0.01" value="${esc(l.precio)}" placeholder="${f&&num(f.precio)?num(f.precio):'0'}" oninput="CP.lineas[${i}].precio=this.value;cpTot()"></label></div>
      ${f?`<p class="hint">Ahora: ${n0(f.gramos)} g (${rl(num(f.gramos)/1000)}) → después: <b>${n0(num(f.gramos)+num(l.rollos)*1000)} g</b></p>`:''}</div>`}).join('')+
@@ -780,13 +882,13 @@ function cpSave(){
     const n=num(l.rollos);
     if(!l.fid){toast('Elige un filamento en cada línea (o quita la línea vacía)');return}
     if(!(n>0)){toast('Pon cuántos rollos has comprado');return}
-    if(l.fid==='__new'&&!String(l.color).trim()){toast('Pon el color / referencia del filamento nuevo');return}
+    if(l.fid==='__new'&&!String(l.color).trim()&&!String(l.ref||'').trim()){toast('Pon el color o la referencia del filamento nuevo');return}
     ls.push(l)}
   if(!ls.length){toast('Añade al menos un filamento');return}
   const lineas=[];let total=0;
   ls.forEach(l=>{
     const n=num(l.rollos);let f,creado=false;
-    if(l.fid==='__new'){f={id:uid('f'),material:l.material,etiquetas:[],marca:String(l.marca).trim(),color:String(l.color).trim(),hex:guessHex(l.color),comprados:0,gramos:0,minimo:0,precio:0};S.filamentos.push(f);creado=true}
+    if(l.fid==='__new'){f={id:uid('f'),material:l.material,etiquetas:[],marca:String(l.marca==='__otra'?(l.marcaNueva||''):l.marca).trim(),color:String(l.color).trim(),ref:String(l.ref||'').trim(),hex:guessHex(l.color),comprados:0,gramos:0,minimo:0,precio:0};S.filamentos.push(f);creado=true}
     else f=fil(l.fid);
     const precioAnt=num(f.precio),precio=l.precio!==''?num(l.precio):precioAnt;
     f.gramos=num(f.gramos)+n*1000;f.comprados=num(f.comprados)+n;if(precio>0)f.precio=precio;
@@ -797,33 +899,34 @@ function cpSave(){
 }
 function cpUndo(id){
   const c=S.compras.find(x=>x.id===id);if(!c)return;
-  ask('Deshacer compra',`<p>Se restarán del stock los rollos de esta compra (${c.lineas.map(l=>l.rollos+' × '+esc((fil(l.fid)||{color:'?'}).color)).join(', ')}).</p>`,()=>{
-    c.lineas.forEach(l=>{const f=fil(l.fid);if(!f)return;f.gramos=Math.max(0,num(f.gramos)-l.rollos*1000);f.comprados=Math.max(0,num(f.comprados)-l.rollos);f.precio=l.precioAnt;
+  ask('Deshacer compra',`<p>Se restarán del stock los rollos de esta compra (${c.lineas.map(l=>l.rollos+' × '+esc(fName(fil(l.fid)||{color:'?'}))).join(', ')}).</p>`,()=>{
+    const sn=snapU();c.lineas.forEach(l=>{const f=fil(l.fid);if(!f)return;f.gramos=Math.max(0,num(f.gramos)-l.rollos*1000);f.comprados=Math.max(0,num(f.comprados)-l.rollos);f.precio=l.precioAnt;
       if(l.creado&&f.gramos<=0&&f.comprados<=0&&!S.impresiones.some(im=>(im.consumo||[]).some(x=>x.fid===f.id)))S.filamentos=S.filamentos.filter(x=>x.id!==f.id)});
-    S.compras=S.compras.filter(x=>x.id!==id);save();toast('Compra deshecha');render()},'Deshacer');
+    S.compras=S.compras.filter(x=>x.id!==id);save();toastU('Compra deshecha.',sn);render()},'Deshacer');
 }
 function cpHist(){
   if(!S.compras.length)return'';
   return`<h3 style="margin:18px 0 8px">Últimas compras</h3>`+S.compras.slice(0,8).map(c=>`<div class="lcard"><div class="lr"><b>${esc(fdate(c.fecha))}${c.nota?' · '+esc(c.nota):''}</b><b>${eur(c.total)}</b></div>
-   <div class="hint">${c.lineas.map(l=>`${n0(l.rollos)} × ${esc((fil(l.fid)||{color:'(borrado)'}).color)}`).join(' · ')}</div>
+   <div class="hint">${c.lineas.map(l=>`${n0(l.rollos)} × ${esc(fName(fil(l.fid)||{color:'(borrado)'}))}`).join(' · ')}</div>
    <div style="margin-top:6px"><button class="ico" onclick="cpUndo('${c.id}')">Deshacer</button></div></div>`).join('')}
-function filPlus(id){const f=fil(id);f.gramos=num(f.gramos)+1000;f.comprados=num(f.comprados)+1;save();toast('+1 rollo: '+f.color);render()}
+function filPlus(id){const f=fil(id);f.gramos=num(f.gramos)+1000;f.comprados=num(f.comprados)+1;save();toast('+1 rollo: '+fName(f));render()}
 function openFil(id){
   FT=id?[...(fil(id).etiquetas||[])]:[];
-  const f=id?fil(id):{material:FMAT||'PLA',etiquetas:[],marca:'',color:'',comprados:1,gramos:1000,minimo:0,precio:0};
+  const f=id?fil(id):{material:FMAT||'PLA',etiquetas:[],marca:'',color:'',ref:'',comprados:1,gramos:1000,minimo:0,precio:0};
   modal(id?'Editar filamento':'Nuevo filamento',`<form id="mform" onsubmit="return false"><div class="fg">
    <label>Material<select name="material">${opts(matList(),f.material)}</select></label>
    <div class="w2"><span class="lbl">Etiquetas (acabado, tipo…)</span><div id="tgbox"></div>
     <div style="display:flex;gap:6px;margin-top:6px"><input id="tgnew" placeholder="Nueva etiqueta…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetAdd()}"><button type="button" class="btn ghost" onclick="fetAdd()">+ Crear</button></div></div>
-   <label>Marca<input name="marca" list="marcas" value="${esc(f.marca)}"><datalist id="marcas">${[...new Set(S.filamentos.map(x=>x.marca).filter(Boolean))].map(m=>`<option value="${esc(m)}">`).join('')}</datalist></label>
-   <label class="w2">Color / referencia<input name="color" value="${esc(f.color)}"></label>
+   <label>Marca<select name="marcaSel" onchange="document.getElementById('marcaNew').style.display=this.value==='__otra'?'block':'none';if(this.value==='__otra')document.getElementById('marcaNew').focus()">${marcaOpts(f.marca)}</select><input id="marcaNew" name="marcaNew" placeholder="Nombre de la marca" style="display:none;margin-top:6px"></label>
+   <label>Color<input name="color" value="${esc(f.color)}" placeholder="Ej. ROJO"></label>
+   <label>Referencia / código<input name="ref" value="${esc(f.ref||'')}" placeholder="Ej. 10200"></label>
    <div class="w2"><span class="lbl">Color visual</span><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><input type="color" name="hex" id="hexin" value="${esc(fHex(f)||'#888888')}" oninput="hexShow()" style="width:64px;height:44px;padding:2px"><b id="hexname"></b><button type="button" class="btn ghost" onclick="hexGuess()">Detectar por el nombre</button></div></div>
    <label>Comprados (rollos)<input type="number" name="comprados" step="1" value="${esc(f.comprados)}"></label>
    <label>Restante (gramos)<input type="number" name="gramos" step="any" value="${esc(f.gramos)}"></label>
    <label>Mínimo (rollos, 0 = sin aviso)<input type="number" name="minimo" step="any" value="${esc(f.minimo)}"></label>
    <label>Precio por rollo (€)<input type="number" name="precio" step="any" value="${esc(f.precio)}"></label></div></form>`,()=>{
-    const n={hex:fv('hex'),material:fv('material'),etiquetas:[...FT],marca:fv('marca').trim(),color:fv('color').trim(),comprados:num(fv('comprados')),gramos:num(fv('gramos')),minimo:num(fv('minimo')),precio:num(fv('precio'))};
-    if(!n.color){toast('Pon el color o referencia');return}
+    const n={hex:fv('hex'),material:fv('material'),etiquetas:[...FT],marca:(fv('marcaSel')==='__otra'?fv('marcaNew'):fv('marcaSel')).trim(),color:fv('color').trim(),ref:fv('ref').trim(),comprados:num(fv('comprados')),gramos:num(fv('gramos')),minimo:num(fv('minimo')),precio:num(fv('precio'))};
+    if(!n.color&&!n.ref){toast('Pon al menos el color o la referencia');return}
     if(id)Object.assign(f,n);else S.filamentos.push(Object.assign({id:uid('f')},n));
     save();closeModal();render();
   },{extra:id?`<button class="btn warn" onclick="delFil('${id}')">Borrar</button>`:''});
@@ -834,34 +937,35 @@ function hexGuess(){const g=guessHex(fv('color'));if(!g){toast('No reconozco ese
 function fetDraw(){const b=document.getElementById('tgbox');if(!b)return;b.innerHTML=tagList().concat(FT.filter(t=>!tagList().includes(t))).map(t=>{const on=FT.includes(t);return`<button type="button" class="tgb ${on?'on':''}" onclick="fetTog(this.dataset.t)" data-t="${esc(t)}">${on?'✓ ':''}${esc(t)}</button>`}).join(' ')}
 function fetTog(t){FT=FT.includes(t)?FT.filter(x=>x!==t):[...FT,t];fetDraw()}
 function fetAdd(){const i=document.getElementById('tgnew'),t=i.value.trim();if(!t)return;const ex=tagList().find(x=>x.toLowerCase()===t.toLowerCase());const v=ex||t;if(!FT.includes(v))FT.push(v);i.value='';fetDraw()}
-function delFil(id){const f=fil(id);ask('Borrar filamento',`<p>Se borrará <b>${esc(f.color)}</b>. Las recetas y el historial que lo usaban lo mostrarán como borrado.</p>`,()=>{S.filamentos=S.filamentos.filter(x=>x.id!==id);S.productos.forEach(p=>{if(p.ficha&&p.ficha.fils)p.ficha.fils=p.ficha.fils.filter(x=>x.fid!==id)});save();render()},'Borrar')}
+function delFil(id){const f=fil(id);ask('Borrar filamento',`<p>Se borrará <b>${esc(fName(f))}</b>. Las recetas y el historial que lo usaban lo mostrarán como borrado.</p>`,()=>{const sn=snapU();rmFils([id]);save();toastU('Filamento borrado.',sn);render()},'Borrar')}
 
 /* ---------- GASTOS ---------- */
 function vGastos(){
   const tot=S.gastos.reduce((a,g)=>a+gTotal(g),0),d=S.gastos.filter(g=>g.desc).reduce((a,g)=>a+gTotal(g),0);
-  const head=`<h2>Gastos</h2><p class="sub">Apunta los gastos en positivo. Los marcados "Descuenta: Sí" restan del beneficio real (inversión de la web y la impresora). Los demás se muestran pero no restan, por ejemplo el filamento, que ya controlas en su stock.</p>
+  const head=`<h2>Gastos</h2><p class="sub">Apunta los gastos en positivo. Los marcados "Descuenta: Sí" restan del beneficio real (inversión de la web y la impresora). Los demás se muestran pero no restan, por ejemplo el filamento, que ya controlas en su stock. La fecha sirve para filtrar el Panel por periodo.</p>
   <div class="bar"><button class="btn blue" onclick="openGasto('')">+ Nuevo gasto</button></div>`;
-  if(isMob())return head+S.gastos.map(g=>`<div class="lcard"><div class="lr"><b>${esc(g.concepto)}</b>${g.desc?chip('info','DESCUENTA: SÍ'):chip('neu','DESCUENTA: NO')}</div><div class="hint">${esc(g.cat)} · ${n0(g.cant)} × ${eur(g.precio)}</div><div class="lr"><b>${eur(gTotal(g))}</b><button class="ico" onclick="openGasto('${g.id}')">Editar</button></div></div>`).join('')
+  if(isMob())return head+S.gastos.map(g=>`<div class="lcard"><div class="lr"><b>${esc(g.concepto)}</b>${g.desc?chip('info','DESCUENTA: SÍ'):chip('neu','DESCUENTA: NO')}</div><div class="hint">${g.fecha?fdate(g.fecha)+' · ':'sin fecha · '}${esc(g.cat)} · ${n0(g.cant)} × ${eur(g.precio)}</div><div class="lr"><b>${eur(gTotal(g))}</b><button class="ico" onclick="openGasto('${g.id}')">Editar</button></div></div>`).join('')
     +`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${eur(tot)}</b></div><div class="hint">Descuentan del beneficio: ${eur(d)}</div></div>`;
-  return head+`<div class="tw"><table><tr><th class="l">Concepto</th><th>Categoría</th><th>Cantidad</th><th>Precio ud</th><th>Total</th><th>Descuenta del beneficio</th><th></th></tr>
-  ${S.gastos.map(g=>`<tr><td class="l">${esc(g.concepto)}</td><td>${esc(g.cat)}</td><td>${n0(g.cant)}</td><td>${eur(g.precio)}</td><td>${eur(gTotal(g))}</td><td>${g.desc?chip('info','Sí'):chip('neu','No')}</td><td><button class="ico" onclick="openGasto('${g.id}')">Editar</button></td></tr>`).join('')||'<tr><td colspan="7" class="hint">Sin gastos.</td></tr>'}
-  <tr class="tot"><td class="l">TOTAL</td><td></td><td></td><td></td><td>${eur(tot)}</td><td>Descuentan: ${eur(d)}</td><td></td></tr></table></div>`;
+  return head+`<div class="tw"><table><tr><th>Fecha</th><th class="l">Concepto</th><th>Categoría</th><th>Cantidad</th><th>Precio ud</th><th>Total</th><th>Descuenta del beneficio</th><th></th></tr>
+  ${S.gastos.map(g=>`<tr><td>${g.fecha?fdate(g.fecha):'<span class="hint">sin fecha</span>'}</td><td class="l">${esc(g.concepto)}</td><td>${esc(g.cat)}</td><td>${n0(g.cant)}</td><td>${eur(g.precio)}</td><td>${eur(gTotal(g))}</td><td>${g.desc?chip('info','Sí'):chip('neu','No')}</td><td><button class="ico" onclick="openGasto('${g.id}')">Editar</button></td></tr>`).join('')||'<tr><td colspan="8" class="hint">Sin gastos.</td></tr>'}
+  <tr class="tot"><td></td><td class="l">TOTAL</td><td></td><td></td><td></td><td>${eur(tot)}</td><td>Descuentan: ${eur(d)}</td><td></td></tr></table></div>`;
 }
 function openGasto(id){
-  const g=id?S.gastos.find(x=>x.id===id):{concepto:'',cat:'Otros',cant:1,precio:0,desc:true};
+  const g=id?S.gastos.find(x=>x.id===id):{concepto:'',cat:'Otros',cant:1,precio:0,desc:true,fecha:today()};
   modal(id?'Editar gasto':'Nuevo gasto',`<form id="mform" onsubmit="return false"><div class="fg">
    <label class="w2">Concepto<input name="concepto" value="${esc(g.concepto)}"></label>
+   <label>Fecha<input type="date" name="fecha" value="${esc(g.fecha||'')}"></label>
    <label>Categoría<select name="cat">${opts(CATS,g.cat)}</select></label>
    <label>Cantidad<input type="number" name="cant" step="any" value="${esc(g.cant)}"></label>
    <label>Precio ud (€)<input type="number" name="precio" step="any" value="${esc(g.precio)}"></label>
    <label style="display:flex;gap:8px;align-items:center;margin-top:20px"><input type="checkbox" name="desc" ${g.desc?'checked':''} style="width:auto;margin:0;min-height:0"> Descuenta del beneficio real</label></div></form>`,()=>{
-    const n={concepto:fv('concepto').trim(),cat:fv('cat'),cant:num(fv('cant')),precio:Math.abs(num(fv('precio'))),desc:fv('desc')};
+    const n={concepto:fv('concepto').trim(),fecha:fv('fecha')||'',cat:fv('cat'),cant:num(fv('cant')),precio:Math.abs(num(fv('precio'))),desc:fv('desc')};
     if(!n.concepto){toast('Pon un concepto');return}
     if(id)Object.assign(g,n);else S.gastos.push(Object.assign({id:uid('g')},n));
     save();closeModal();render();
   },{extra:id?`<button class="btn warn" onclick="delGasto('${id}')">Borrar</button>`:''});
 }
-function delGasto(id){ask('Borrar gasto','<p>Se borrará el gasto.</p>',()=>{S.gastos=S.gastos.filter(g=>g.id!==id);save();render()},'Borrar')}
+function delGasto(id){ask('Borrar gasto','<p>Se borrará el gasto.</p>',()=>{const sn=snapU();S.gastos=S.gastos.filter(g=>g.id!==id);save();toastU('Gasto borrado.',sn);render()},'Borrar')}
 
 /* ---------- MÁS (móvil) ---------- */
 function vMas(){return`<h2>Más</h2><p class="sub">Otras secciones de la app.</p>`+[['panel','Panel','Resumen: beneficio, ventas y alertas'],['gastos','Gastos','Inversión y gastos'],['notas','Notas','Contactos, enlaces e ideas'],['ajustes','Ajustes','Parámetros de coste y copia de seguridad']].map(([k,l,d])=>`<button class="lcard menu" onclick="go('${k}')"><b>${l}</b><span class="hint">${d}</span></button>`).join('')}
@@ -899,14 +1003,14 @@ function exportJSON(){
 async function importJSON(file){
   if(!file)return;
   try{const d=JSON.parse(await file.text());if(!d.filamentos||!d.productos)throw new Error('no parece una copia de esta app');
-    ask('Importar copia',`<p>Se reemplazarán <b>todos</b> los datos actuales por los de la copia (${d.productos.length} productos, ${d.filamentos.length} filamentos).</p>`,()=>{S=fix(d);save();toast('Copia importada');render()},'Importar');
+    ask('Importar copia',`<p>Se reemplazarán <b>todos</b> los datos actuales por los de la copia (${d.productos.length} productos, ${d.filamentos.length} filamentos).</p>`,()=>{const sn=snapU();S=fix(d);freezeOrders();save();toastU('Copia importada.',sn);render()},'Importar');
   }catch(e){toast('⚠ Copia no válida: '+e.message)}
 }
-function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{S=fix(JSON.parse(JSON.stringify(SEED)));save();toast('Datos iniciales cargados');render()},'Restaurar')}
+function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.02';
-const APP_NOTAS='v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.08';
+const APP_NOTAS='v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
@@ -926,15 +1030,16 @@ async function syRpc(fn,body){
   return r.json();
 }
 async function syPush(force){
-  if(!syOn()||SYBUSY)return;
-  SYBUSY=true;syStatus('busy');
+  if(!syOn())return;
+  if(SYBUSY){SYAGAIN=true;return}
+  SYBUSY=true;syStatus('busy');const seq=SYSEQ;
   try{
     const r=await syRpc('ept_set',{p_clave:SY.clave,p_data:S,p_base:force?null:(SY.rev||null),p_force:!!force});
-    if(r&&r.ok){SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok')}
+    if(r&&r.ok){SY.rev=r.updated_at;SY.dirty=(SYSEQ!==seq);sySave();syStatus(SY.dirty?'dirty':'ok');if(SY.dirty)SYAGAIN=true}
     else if(r&&r.conflict){syStatus('conf','hay una versión más nueva en la nube');syConflict(r.updated_at)}
     else syStatus('err','respuesta inesperada');
   }catch(e){syStatus('err',e.message)}
-  finally{SYBUSY=false}
+  finally{SYBUSY=false;if(SYAGAIN){SYAGAIN=false;if(SY.dirty)setTimeout(()=>syPush(),300)}}
 }
 async function syPull(manual){
   if(!syOn()||SYBUSY)return;
@@ -949,7 +1054,7 @@ async function syPull(manual){
     syApply(r);if(manual)toast('Datos actualizados desde la nube');
   }catch(e){SYBUSY=false;syStatus('err',e.message)}
 }
-function syApply(r){S=fix(r.data);saveLocal();SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok');render()}
+function syApply(r){S=fix(r.data);freezeOrders();saveLocal();SY.rev=r.updated_at;SY.dirty=false;sySave();syStatus('ok');render()}
 function syConflict(fecha,remote){
   const f=fecha?new Date(fecha).toLocaleString('es-ES'):'?';
   modal('Datos distintos en la nube',`<p>Los datos de este dispositivo y los de la nube (guardados el <b>${esc(f)}</b>) no coinciden. Elige cuáles quieres conservar; los otros se pierden.</p>
@@ -982,9 +1087,12 @@ function syConnect(){
   SY={url:u,key:k,clave:c,rev:null,dirty:false};sySave();syPaint();syPull(true);
 }
 function syOff(){SY={};sySave();SYST=null;syPaint();toast('Desconectado. Los datos siguen en este navegador.');if(TAB==='ajustes')render()}
+window.addEventListener('storage',e=>{if(e.key===LS&&e.newValue&&!MOD){try{S=fix(JSON.parse(e.newValue));freezeOrders();render()}catch(x){}}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&syOn()&&!SY.dirty)syPull()});
 window.addEventListener('online',()=>{if(syOn())(SY.dirty?syPush():syPull())});
 
+if('serviceWorker' in navigator&&/^https?:/.test(location.protocol))navigator.serviceWorker.register('sw.js').catch(()=>{});
+freezeOrders();
 applyTheme();
 render();
 syPaint();document.getElementById('ver').textContent='v'+APP_VERSION;if(syOn())syPull();
