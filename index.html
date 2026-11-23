@@ -82,6 +82,16 @@ tr:hover td{background:#fafaff}tr.band:hover td{background:var(--blue)}tr.tot:ho
 .cdot.big{width:32px;height:32px;border-radius:8px;vertical-align:middle}
 .cnm{display:flex;align-items:center;gap:10px}.cnm>span{display:block}.cnm b,.cnm .hint{display:block}
 .rst b{display:block;font-size:16px}.rst .hint{display:block}
+/* lista de filamento compacta */
+table.fl td{padding:2px 8px}table.fl .rst{white-space:nowrap}
+table.fl .cnm{gap:8px}table.fl .cdot.big{width:22px;height:22px;border-width:2px;border-radius:6px}
+table.fl .cnm b{font-size:13px}
+table.fl .rst b,table.fl .rst .hint{display:inline}table.fl .rst b{font-size:14px}table.fl .rst .hint{margin-left:6px}
+table.fl .ico{padding:2px 8px;font-size:12px}
+table.fl .tg{padding:0 7px;font-size:11px}table.fl .chip{padding:1px 7px}
+table.fl .drg{padding:0 6px;font-size:17px}
+.lcard.fc{padding:7px 10px;margin-bottom:6px}.lcard.fc .rst b,.lcard.fc .rst .hint{display:inline}.lcard.fc .cdot.big{width:26px;height:26px}
+tr.band td{padding:4px 10px}
 .cdot.none{background:transparent}
 @media(max-width:480px){.tbtn{padding:6px 9px;font-size:12px}}
 .brand .logo{display:flex;align-items:center;gap:10px}.brand img{height:34px;width:auto;display:block}
@@ -815,12 +825,11 @@ function vFilamento(){
     h+=mob?`<div class="mband">${esc(m)}</div>`:`<tr class="band"><td colspan="${NC}">${esc(m)}</td></tr>`;
     it.forEach(f=>{const[k,t]=fEstado(f);
       const q=esc((fName(f)+' '+f.marca+' '+(f.etiquetas||[]).join(' ')+' '+f.material).toLowerCase());
-      h+=mob?`<div class="lcard ${FSEL.has(f.id)?'selected':''}" data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}"><div class="lr"><div class="cnm">${dh(f)}${cb(f)}${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${f.ref?'Ref. '+esc(f.ref)+' · ':''}${fColName(f)} · ${f.marca?esc(f.marca):'Sin marca'}</span></span></div>${chip(k,t)}</div>
-        <div style="margin-top:6px">${tagChips(f)||'<span class="hint">sin etiquetas</span>'}</div>
-        <div class="rst" style="margin:8px 0"><b>${rl(num(f.gramos)/1000)}</b><span class="hint">${n0(f.gramos)} g</span></div>
-        <div class="lr"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div>`
-      :`<tr data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}" class="${FSEL.has(f.id)?'selected':''}">${dr?`<td>${dh(f)}</td>`:''}${FSM?`<td>${cb(f)}</td>`:''}<td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:170px"><div class="cnm">${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${fColName(f)}</span></span></div></td><td class="l">${f.ref?esc(f.ref):'<span class="hint">–</span>'}</td>
-      <td class="l"><div class="rst"><b>${rl(num(f.gramos)/1000)}</b><span class="hint">${n0(f.gramos)} g</span></div></td>
+      h+=mob?`<div class="lcard fc ${FSEL.has(f.id)?'selected':''}" data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}"><div class="lr"><div class="cnm">${dh(f)}${cb(f)}${fSw(f,1)}<span><b>${esc(f.color||'(sin color)')}</b><span class="hint">${f.ref?'Ref. '+esc(f.ref)+' · ':''}${f.marca?esc(f.marca):'Sin marca'}</span></span></div>${chip(k,t)}</div>
+        <div class="lr" style="margin-top:5px"><span>${tagChips(f)||'<span class="hint">sin etiquetas</span>'}</span><span class="rst"><b>${rl(num(f.gramos)/1000)}</b> <span class="hint">${n0(f.gramos)} g</span></span></div>
+        <div class="lr" style="margin-top:5px"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div>`
+      :`<tr data-q="${q}" data-id="${f.id}" data-mat="${esc(f.material)}" class="${FSEL.has(f.id)?'selected':''}">${dr?`<td>${dh(f)}</td>`:''}${FSM?`<td>${cb(f)}</td>`:''}<td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal;min-width:150px"><div class="cnm">${fSw(f,1)}<b>${esc(f.color||'(sin color)')}</b></div></td><td class="l">${f.ref?esc(f.ref):'<span class="hint">–</span>'}</td>
+      <td class="l"><div class="rst"><b>${rl(num(f.gramos)/1000)}</b> <span class="hint">${n0(f.gramos)} g</span></div></td>
       <td>${num(f.comprados)}</td><td>${num(f.minimo)||'–'}</td><td>${num(f.precio)?eur(f.precio):'<span class="hint">sin precio</span>'}</td><td>${eur(num(f.gramos)/1000*num(f.precio))}</td><td>${chip(k,t)}</td>
       <td style="white-space:nowrap"><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" title="Añadir un rollo nuevo (+1000 g)" onclick="filPlus('${f.id}')">+1 rollo</button></td></tr>`});
   });
@@ -836,7 +845,7 @@ function vFilamento(){
   </div>
   <div class="bar" style="flex-wrap:nowrap;overflow-x:auto">${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" style="flex:0 0 auto" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
   ${mob?h+`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${n0(g)} g · ${eur(valor)}</b></div></div>`
-  :`<div class="tw"><table><tr>${dr?'<th></th>':''}${FSM?'<th><input type="checkbox" class="selc" id="selall" title="Seleccionar todos los visibles" aria-label="Seleccionar todos los visibles" onchange="fselAll(this.checked)"></th>':''}${th('tags')}${th('marca')}${th('color','l')}${th('ref','l')}${th('rest','l')}${th('comp')}${th('min')}${th('precio')}${th('valor')}${th('estado')}<th></th></tr>${h||`<tr><td colspan="${NC}" class="hint">Sin resultados.</td></tr>`}
+  :`<div class="tw"><table class="fl"><tr>${dr?'<th></th>':''}${FSM?'<th><input type="checkbox" class="selc" id="selall" title="Seleccionar todos los visibles" aria-label="Seleccionar todos los visibles" onchange="fselAll(this.checked)"></th>':''}${th('tags')}${th('marca')}${th('color','l')}${th('ref','l')}${th('rest','l')}${th('comp')}${th('min')}${th('precio')}${th('valor')}${th('estado')}<th></th></tr>${h||`<tr><td colspan="${NC}" class="hint">Sin resultados.</td></tr>`}
   <tr class="tot"><td colspan="${(FSM?5:4)+(dr?1:0)}" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
   ${FSM?fselBar(list.length):''}${cpHist()}<p class="hint">Mostrando ${list.length} de ${S.filamentos.length} filamentos${(FMAT||FMARCA||FTAG||FALERT)?' (con filtros)':''}.${FSORT.k?' Orden: '+fSortTxt()+'.':''}${dr?' Arrastra ⠿ (o usa las flechas ↑ ↓ con el foco en él) para ordenar a tu gusto: ese es tu orden por defecto.':' Para arrastrar, quita el orden de columna (pulsa el título hasta que no tenga flecha).'}${mob?'':' Pulsa el título de una columna para ordenar: 1ª vez A → Z (o de más a menos), 2ª al revés, 3ª vuelve al orden original.'}</p><p class="legend">Estados: ● OK · ▲ BAJO (en el mínimo o por debajo) · ✖ AGOTADO (0 g).</p>`;
 }
@@ -1065,8 +1074,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.11';
-const APP_NOTAS='v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.12';
+const APP_NOTAS='v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
