@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#1E1E24">
+<title>EPTaller</title>
+<meta name="apple-mobile-web-app-title" content="EPTaller">
+<meta name="application-name" content="EPTaller">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--carbon:#1E1E24;--carbon2:#33333D;--yellow:#FFD21F;--yellowL:#FFF1B0;--blue:#2A5CFF;--blueL:#E1E8FF;--orange:#FF9A3C;--cream:#FBF7EC;--grey:#5E5E6B;--line:#DEDEE3;--pale:#F4F4F6;--red:#B00020}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#15151a;background:#fff}
+button,input,select,textarea{font:inherit}
+header.top{background:var(--carbon);color:#fff;position:sticky;top:0;z-index:20;border-bottom:4px solid var(--yellow)}
+.brand{padding:10px 16px 4px;font-weight:bold;font-size:18px;letter-spacing:.3px}
+.brand span{color:var(--yellow);font-weight:normal;font-size:13px;margin-left:6px}
+nav{display:flex;gap:2px;overflow-x:auto;padding:0 8px;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{background:none;border:0;color:#cfd0d8;padding:10px 14px;font-size:14px;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent}
+nav button.on{color:#fff;font-weight:bold;border-bottom-color:var(--blue)}
+main{max-width:1240px;margin:0 auto;padding:16px}
+h2{margin:6px 0 2px;font-size:22px;color:var(--carbon)}
+h3{margin:0 0 10px;font-size:15px;color:var(--carbon)}
+.sub{color:var(--grey);margin:0 0 14px;font-size:13px;line-height:1.4}
+.banner{background:var(--yellowL);border-left:5px solid var(--yellow);padding:9px 14px;margin:0;font-size:13px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.card{border:1px solid var(--line);border-top:4px solid var(--blue);background:#fff;padding:14px;margin-bottom:14px}
+.card.dark{border-top-color:var(--carbon)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--pale);border-top:4px solid var(--blue);padding:10px 14px}
+.kpi.y{border-top-color:var(--yellow)}
+.kpi small{display:block;color:var(--grey);font-weight:bold;font-size:11px;letter-spacing:.3px;text-transform:uppercase}
+.kpi b{display:block;font-size:24px;color:var(--carbon);margin:4px 0}
+.kpi em{font-size:12px;color:var(--grey);display:block;overflow-wrap:anywhere}.kpi .chip{white-space:normal}
+@media(max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.kpi b{font-size:20px}.kpi{padding:8px 10px}.kpi small{font-size:10px}main{padding:10px}}
+label{display:block;font-size:12px;color:var(--grey);font-weight:bold}
+label>input,label>select,label>textarea{display:block;width:100%;margin-top:4px;font-weight:normal}
+input,select,textarea{border:1px solid #c9c9d1;border-radius:4px;padding:8px;background:var(--cream);color:#0000c8;min-height:38px}
+select{color:#0000c8}
+textarea{width:100%;min-height:300px;font-family:Arial;line-height:1.5}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--blue);outline-offset:0}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.fg .w2{grid-column:span 2}.fg .wall{grid-column:1/-1}
+@media(max-width:480px){.fg .w2{grid-column:1/-1}}
+.btn{background:var(--carbon);color:#fff;border:0;padding:10px 16px;border-radius:4px;cursor:pointer;font-weight:bold}
+.btn.blue{background:var(--blue)}.btn.ghost{background:#fff;color:var(--carbon);border:1px solid var(--carbon)}
+.btn.warn{background:#fff;color:var(--red);border:1px solid var(--red)}
+.btn.big{padding:14px 22px;font-size:16px;width:100%}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.ico{background:none;border:1px solid var(--line);border-radius:4px;cursor:pointer;padding:6px 9px;color:var(--grey)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.bar .sp{flex:1}
+.tw{overflow-x:auto;border:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{background:var(--carbon);color:#fff;padding:8px 8px;text-align:center;font-size:12px;white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+td.l,th.l{text-align:left}td.l{white-space:normal}td.r{text-align:right}
+tr.band td{background:var(--blue);color:#fff;font-weight:bold;text-align:left;padding:6px 10px}
+tr.tot td{background:var(--blueL);font-weight:bold;color:var(--carbon);border-top:2px solid var(--blue)}
+tr.pack td:first-child{padding-left:22px;font-style:italic}
+tr.cancel td{color:#8a8a95;text-decoration:line-through}
+tr:hover td{background:#fafaff}tr.band:hover td{background:var(--blue)}tr.tot:hover td{background:var(--blueL)}
+.chip{display:inline-block;padding:2px 8px;border-radius:3px;font-weight:bold;font-size:11px;white-space:nowrap}
+.chip.ok{background:var(--blueL);color:var(--carbon)}
+.chip.low{background:var(--yellowL);color:#7A4A00}
+.chip.out{background:var(--orange);color:#000}
+.chip.neu{background:#ececf0;color:var(--grey)}
+.chip.info{background:var(--blue);color:#fff}
+.neg{color:var(--red);font-weight:bold}
+.cdot{display:inline-block;width:18px;height:18px;border-radius:50%;border:2px solid #8a8a96;vertical-align:-4px;flex:none;text-align:center;font-size:11px;font-style:normal;line-height:14px}
+.cdot.big{width:28px;height:28px;vertical-align:middle}
+.cdot.none{background:transparent}
+.lbl{display:block;font-weight:bold;font-size:13px;margin-bottom:6px}
+.tg{display:inline-block;padding:1px 8px;border:1px solid var(--carbon);border-radius:10px;font-size:11px;font-weight:bold;margin-right:2px}
+.tgb{border:1px solid var(--grey);background:#fff;color:var(--carbon);border-radius:14px;padding:6px 12px;font-size:13px;margin:0 4px 6px 0;cursor:pointer}
+.tgb.on{background:var(--carbon);color:#fff;border-color:var(--carbon);font-weight:bold}
+html[data-theme=dark] .tg{border-color:#8FA8FF;color:#DCE5FF}
+html[data-theme=dark] .tgb{background:#1c1c24;color:#ddd;border-color:#4a4a58}
+html[data-theme=dark] .tgb.on{background:#2A5CFF;color:#fff;border-color:#6C8BFF}
+.meter{display:inline-block;width:64px;height:8px;background:#e6e6ec;vertical-align:middle;margin-right:6px;border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--blue)}
+.meter.low i{background:var(--yellow)}.meter.out i{background:var(--orange)}
+.hbar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}
+.hbar .n{width:44%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .b{flex:1;background:#ececf0;height:14px;border-radius:2px}
+.hbar .b i{display:block;height:100%;background:var(--blue);border-radius:2px}
+.hbar.y .b i{background:var(--yellow)}
+.hbar .v{width:84px;text-align:right;font-weight:bold}
+.note{background:var(--yellowL);border-left:4px solid var(--yellow);padding:8px 12px;font-size:12.5px;line-height:1.45;margin:10px 0}
+.hint{font-size:12px;color:var(--grey);margin-top:4px}
+.sw{display:inline-block;width:12px;height:12px;border:1px solid #888;vertical-align:-2px;margin-right:5px}
+.edrow{display:grid;grid-template-columns:1fr 120px 34px;gap:8px;align-items:end;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed var(--line)}
+.edrow.pr{grid-template-columns:1fr 110px 100px 100px 34px}
+.edc span{display:block;font-size:11px;color:var(--grey);font-weight:bold}
+.edc b{display:block;padding:9px 0}
+.edsel select{width:100%}
+@media(max-width:700px){.edrow,.edrow.pr{grid-template-columns:1fr 1fr 34px}.edrow .edsel{grid-column:1/-1}.edrow.pr{grid-template-columns:1fr 1fr 1fr 34px}.edrow.pr .edsel{grid-column:1/-1}}
+.ov{position:fixed;inset:0;background:rgba(20,20,30,.55);z-index:50;display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px 10px}
+.mod{background:#fff;width:100%;max-width:820px;border-top:5px solid var(--yellow)}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--carbon);color:#fff}
+.mh .x{background:none;border:0;color:#fff;font-size:18px;cursor:pointer}
+.mb{padding:16px}
+.mf{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid var(--line);flex-wrap:wrap}
+.mf .sp{flex:1}
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--carbon);color:#fff;padding:10px 18px;border-left:5px solid var(--yellow);z-index:60;display:none;max-width:92vw;font-size:13px}
+.sumrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);gap:10px}
+.sumrow b{text-align:right}
+.hist{border-bottom:1px solid var(--line);padding:10px 0;display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.hist .m{flex:1;min-width:220px}
+.pill{display:inline-block;background:var(--pale);border:1px solid var(--line);border-radius:3px;padding:1px 7px;margin:2px 4px 2px 0;font-size:12px}
+.legend{font-size:12px;color:var(--grey);margin-top:8px}
+
+.brand{display:flex;justify-content:space-between;align-items:center}
+.tbtn{background:transparent;color:#fff;border:1px solid #6b6b7a;border-radius:14px;padding:4px 12px;font-size:12px;cursor:pointer}
+#bnav{display:none}
+.lcard{border:1px solid var(--line);border-left:5px solid var(--blue);background:var(--pale);padding:10px 12px;margin-bottom:8px}
+.lcard.fcard{padding:0;border-left-width:1px}
+.fcard .fhead{min-height:62px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px;padding:8px 12px}
+.fcard .fn{font-size:16px;padding:3px 8px;background:rgba(255,255,255,.93);color:#111;border-radius:3px}
+.fcard .fc{font-size:12px;font-weight:bold;padding:3px 8px;background:rgba(0,0,0,.78);color:#fff;border-radius:3px;white-space:nowrap}
+.fcard .fbody{padding:10px 12px 12px}
+.lcard.tot{border-left-color:var(--yellow)}
+.lcard.pk{margin-left:14px;border-left-color:var(--grey)}
+.lcard.cancel b,.lcard.cancel .kv{text-decoration:line-through;opacity:.7}
+.lcard.menu{display:block;width:100%;text-align:left;color:inherit;cursor:pointer;font-size:15px;padding:14px}
+.lcard.menu b{display:block;margin-bottom:2px}
+.lr{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.kv{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;margin:6px 0}
+.mband{background:var(--blue);color:#fff;font-weight:bold;padding:6px 10px;margin:12px 0 8px}
+@media(max-width:700px){
+ nav#nav{display:none}
+ #bnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--carbon);border-top:3px solid var(--yellow);z-index:30}
+ #bnav button{flex:1;background:none;border:0;color:#cfd0d8;padding:7px 2px 9px;font-size:11px;display:flex;flex-direction:column;gap:1px;align-items:center;cursor:pointer}
+ #bnav button span{font-size:18px;line-height:1.2}
+ #bnav button.on{color:#fff;font-weight:bold;box-shadow:inset 0 3px 0 var(--blue)}
+ body{padding-bottom:70px}
+ .brand{padding:8px 14px}
+ .banner{font-size:12px;padding:6px 10px;gap:8px}.banner .btn{padding:6px 10px;font-size:12px}
+ h2{font-size:20px}
+ .mf .btn{flex:1}
+}
+html[data-theme=dark]{color-scheme:dark;--carbon:#0B0B0F;--carbon2:#1B1B22;--yellowL:#3B3306;--blueL:#223062;--cream:#262630;--grey:#A8A8B8;--line:#363642;--pale:#1B1B22;--red:#FF8A98}
+html[data-theme=dark] body{background:#121216;color:#ECECF1}
+html[data-theme=dark] h2,html[data-theme=dark] h3,html[data-theme=dark] .kpi b,html[data-theme=dark] .hist b{color:#fff}
+html[data-theme=dark] a{color:#8FA8FF}
+html[data-theme=dark] .card,html[data-theme=dark] .mod{background:#17171d}
+html[data-theme=dark] .mh{background:#0B0B0F}
+html[data-theme=dark] input,html[data-theme=dark] select,html[data-theme=dark] textarea{color:#AFC0FF;border-color:#4a4a58}
+html[data-theme=dark] input::placeholder{color:#8a8a99}
+html[data-theme=dark] .btn{background:#2A2A35}
+html[data-theme=dark] .btn.blue{background:#2A5CFF}
+html[data-theme=dark] .btn.ghost{background:transparent;color:#ECECF1;border-color:#9b9bab}
+html[data-theme=dark] .btn.warn{background:transparent;color:var(--red);border-color:var(--red)}
+html[data-theme=dark] .ico{background:transparent;color:#D0D0DC;border-color:#4a4a58}
+html[data-theme=dark] .chip.ok{background:#223062;color:#DCE5FF}
+html[data-theme=dark] .chip.low{background:#4A3D0A;color:#FFE27A}
+html[data-theme=dark] .chip.neu{background:#2E2E38;color:#C4C4D2}
+html[data-theme=dark] tr.tot td{background:#1C2650;color:#fff;border-top-color:#6C8BFF}
+html[data-theme=dark] tr:hover td{background:#1F1F28}
+html[data-theme=dark] tr.band:hover td{background:var(--blue)}
+html[data-theme=dark] .hbar .b,html[data-theme=dark] .meter{background:#2E2E38}
+html[data-theme=dark] .hbar .b i,html[data-theme=dark] .meter i{background:#6C8BFF}
+html[data-theme=dark] .hbar.y .b i{background:var(--yellow)}
+html[data-theme=dark] .meter.low i{background:var(--yellow)}
+html[data-theme=dark] .meter.out i{background:var(--orange)}
+html[data-theme=dark] .note,html[data-theme=dark] .banner{color:#F3E6A6}
+html[data-theme=dark] .kpi{border-top-color:#6C8BFF}
+html[data-theme=dark] .kpi.y{border-top-color:var(--yellow)}
+html[data-theme=dark] .card{border-top-color:#6C8BFF}
+html[data-theme=dark] .card.dark{border-top-color:#8a8a99}
+html[data-theme=dark] .lcard{border-left-color:#6C8BFF}
+html[data-theme=dark] .lcard.tot{border-left-color:var(--yellow)}
+html[data-theme=dark] #toast{border:1px solid var(--line);border-left:5px solid var(--yellow)}
+html[data-theme=dark] .ov{background:rgba(0,0,0,.7)}
+html[data-theme=dark] .sw{border-color:#bbb}
+html[data-theme=dark] tr.cancel td{color:#8a8a99}
+</style>
+</head>
+<body>
+<header class="top"><div class="brand"><div>EPTaller<span>by ELPUTORIDER</span></div><button id="tbtn" class="tbtn" onclick="cycleTheme()" aria-label="Cambiar tema">◐ Auto</button></div><nav id="nav"></nav></header>
+<div id="banner"></div>
+<main id="view"></main>
+<div id="bnav"></div>
+<div id="modal-root"></div>
+<div id="toast"></div>
+<input type="file" id="f3mf" accept=".3mf,.gcode.3mf" style="display:none" onchange="pdImport(this.files[0]);this.value=''">
+<input type="file" id="fjson" accept=".json,application/json" style="display:none" onchange="importJSON(this.files[0]);this.value=''">
+
+<script>
+'use strict';
+const SEED={"ajustes": {"elec": 0.13, "impresora": 100, "vida": 5000, "merma": 0.15, "margen": 0.6, "regalados": "Sí", "precioKg": 12}, "embalaje": {"sobre": 0.3277, "caja": 2.1}, "filamentos": [{"id": "f001", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "BLANCO JADE 10100", "comprados": 5, "gramos": 4000, "minimo": 2, "precio": 12}, {"id": "f002", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "BAMBU NEGRO 10101", "comprados": 37, "gramos": 17000, "minimo": 5, "precio": 12}, {"id": "f003", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "PURPURA 10700", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f004", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "ROSA FUCSIA 10204", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f005", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "ROJO 10200", "comprados": 2, "gramos": 2000, "minimo": 0, "precio": 12}, {"id": "f006", "material": "PLA", "tipo": "Básico", "marca": "Elegoo", "color": "ROJO ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 11}, {"id": "f007", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "AMARILLO 10400", "comprados": 5, "gramos": 5000, "minimo": 0, "precio": 12}, {"id": "f008", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "NARANJA 10300", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f009", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "NARANJA  CALAB 10301", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f010", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "BLUE GRAY 10602", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f011", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "PLATEADO 10102", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f012", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "DORADO 10401", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f013", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "CYAN 10603", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f014", "material": "PLA", "tipo": "Básico", "marca": "Elegoo", "color": "CYAN MAG ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f015", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "BEIS 10101", "comprados": 2, "gramos": 2000, "minimo": 0, "precio": 12}, {"id": "f016", "material": "PLA", "tipo": "Básico", "marca": "Elegoo", "color": "BEIS ELEGO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f017", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "AZUL COBALTO 10604", "comprados": 2, "gramos": 2000, "minimo": 0, "precio": 12}, {"id": "f018", "material": "PLA", "tipo": "Básico", "marca": "Elegoo", "color": "ELEGOO DARK BLUE", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 10}, {"id": "f019", "material": "PLA", "tipo": "Básico", "marca": "Elegoo", "color": "ELEGOO SKY BLUE", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 10}, {"id": "f020", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "GRIS OSCURO 10105", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f021", "material": "PLA", "tipo": "Básico", "marca": "Bambu Lab", "color": "VERDE BRILLANTE 10503", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f022", "material": "PLA", "tipo": "Mate", "marca": "Bambu Lab", "color": "BLANCO MARFIL MATE (ivory) 11100", "comprados": 2, "gramos": 2000, "minimo": 2, "precio": 12}, {"id": "f023", "material": "PLA", "tipo": "Mate", "marca": "Elegoo", "color": "PLA MATE ICE BLUE ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 14}, {"id": "f024", "material": "PLA", "tipo": "Silk", "marca": "Bambu Lab", "color": "PLA SILK  PLATEADO 13109", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f025", "material": "PLA", "tipo": "Silk", "marca": "Elegoo", "color": "PLA SILK ELEGO SILVER GRAY", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f026", "material": "PLA", "tipo": "Plus", "marca": "Elegoo", "color": "PLA PLUS  NEGRO EGO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 12}, {"id": "f027", "material": "PLA", "tipo": "Translúcido", "marca": "Bambu Lab", "color": "PLA Translu Amarill  13410", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 13}, {"id": "f028", "material": "PLA", "tipo": "Madera", "marca": "Elegoo", "color": "PLA WOOD ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f029", "material": "PETG", "tipo": "Básico", "marca": "Elegoo", "color": "AMARILLO ELEGOO", "comprados": 2, "gramos": 2000, "minimo": 0, "precio": 18}, {"id": "f030", "material": "PETG", "tipo": "Básico", "marca": "Elegoo", "color": "NEGRO ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f031", "material": "PETG", "tipo": "Básico", "marca": "Elegoo", "color": "BLANCO ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f032", "material": "PETG", "tipo": "Translúcido", "marca": "Bambu Lab", "color": "TRANSLUCENT TRANSP 32101 (R)", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f033", "material": "PETG", "tipo": "Translúcido", "marca": "Bambu Lab", "color": "TRANSLUCENT AZUL 32600 (R)", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 15}, {"id": "f034", "material": "PETG", "tipo": "Fibra de carbono", "marca": "Elegoo", "color": "PETG CF ELEGOO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 17}, {"id": "f035", "material": "TPU", "tipo": "Flexible", "marca": "Elegoo", "color": "ELEGO 95A NEGRO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 18}, {"id": "f036", "material": "TPU", "tipo": "Flexible", "marca": "Bambu Lab", "color": "TPU BAMBU AMS", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 35}, {"id": "f037", "material": "OLD", "tipo": "Antiguo", "marca": "Spiderprint", "color": "SPIDERPRINT NEGRO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f038", "material": "OLD", "tipo": "Antiguo", "marca": "Spiderprint", "color": "SPIDERPRINT BLANCO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f039", "material": "OLD", "tipo": "Antiguo", "marca": "Spiderprint", "color": "SPIDERPRINT AMARILLO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f040", "material": "OLD", "tipo": "Antiguo", "marca": "Spiderprint", "color": "SPIDERPRINT ROJO", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f041", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "MALVA", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f042", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "(sin nombre)", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f043", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "(sin nombre)", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f044", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "GOLD", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f045", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "SILVER", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f046", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "ACACIA", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}, {"id": "f047", "material": "OLD", "tipo": "Antiguo", "marca": "", "color": "ROBLE", "comprados": 1, "gramos": 1000, "minimo": 0, "precio": 0}], "productos": [{"id": "p001", "nombre": "PS_001 PASACABLES PEQUEÑO", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 182, "vendAnt": 59, "regalados": 85, "precio": 3.5, "extra": 0, "costeManual": 0.7, "ficha": {"fils": [{"fid": "f002", "g": 0}], "horas": 3, "piezas": 1, "plasticoManual": 0.18, "extras": 0, "embalaje": "sobre", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual de 0,70 € heredado del Excel. Si lo borras se usa el calculado (0,657 €). Filamento de la receta: negro Bambu (supuesto), con gramos pendientes de rellenar.", "link": ""}}, {"id": "p002", "nombre": "OF x5 PS_001", "tipo": "Pack", "base": "p001", "uds": 5, "fabAnt": 0, "vendAnt": 4, "regalados": 0, "precio": 13.99, "extra": 0, "costeManual": null, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "", "link": ""}}, {"id": "p003", "nombre": "OF X10 PS_001", "tipo": "Pack", "base": "p001", "uds": 10, "fabAnt": 0, "vendAnt": 1, "regalados": 0, "precio": 25.99, "extra": 0, "costeManual": null, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "", "link": ""}}, {"id": "p004", "nombre": "OF X20 PS_001", "tipo": "Pack", "base": "p001", "uds": 20, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 45.99, "extra": 0, "costeManual": null, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "", "link": ""}}, {"id": "p005", "nombre": "IMAN TRUSS", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 0.75, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p006", "nombre": "TR_40 LANYARH TRUSS 40 cm", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 9, "vendAnt": 9, "regalados": 0, "precio": 25.99, "extra": 60, "costeManual": 8.7, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p007", "nombre": "TR_70 LANYARH TRUSS 70 cm plus", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 2, "vendAnt": 2, "regalados": 0, "precio": 35.99, "extra": 20, "costeManual": 14.48, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p008", "nombre": "TR_100 LANYARH TRUSS 100 cm max", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 1, "vendAnt": 1, "regalados": 0, "precio": 45.99, "extra": 0, "costeManual": 20.22, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p009", "nombre": "PASACABLES PERSONALIZADOS", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 22, "vendAnt": 22, "regalados": 2, "precio": 1.5, "extra": 0, "costeManual": 0.6, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p010", "nombre": "SOPORTE PC MA3", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 4, "vendAnt": 4, "regalados": 0, "precio": 11.99, "extra": 0, "costeManual": 3, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p011", "nombre": "SOPORTE PC AVO", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 1, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p012", "nombre": "SOPORTE PC CHAMSYS", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 1, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p013", "nombre": "SOPORTE MOVIL MA3", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 1, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p014", "nombre": "SOPORTE CAMARA MA3", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 1, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}, {"id": "p015", "nombre": "SOPORTE MOVIL APPLE", "tipo": "Producto", "base": "", "uds": 0, "fabAnt": 0, "vendAnt": 0, "regalados": 0, "precio": 5, "extra": 0, "costeManual": 1, "ficha": {"fils": [], "horas": 0, "piezas": 0, "plasticoManual": 0, "extras": 0, "embalaje": "", "perfil": "", "temp": "", "capa": "", "obs": "Coste manual heredado del Excel.", "link": ""}}], "pedidos": [], "gastos": [{"id": "g001", "concepto": "BAMBULAB H2S", "cat": "Impresora", "cant": 1, "precio": 1423, "desc": true}, {"id": "g002", "concepto": "WEB", "cat": "Web", "cant": 1, "precio": 200, "desc": true}, {"id": "g003", "concepto": "MAQUINA HUMO", "cat": "Equipamiento", "cant": 1, "precio": 70, "desc": true}, {"id": "g004", "concepto": "PETG TRANSPARENT", "cat": "Filamento", "cant": 2, "precio": 12.86, "desc": false}, {"id": "g005", "concepto": "PLA NEGRO RELLENAR", "cat": "Filamento", "cant": 7, "precio": 12.86, "desc": false}, {"id": "g006", "concepto": "PLA Various", "cat": "Filamento", "cant": 1, "precio": 419, "desc": false}, {"id": "g007", "concepto": "FILAM FEBRERO", "cat": "Filamento", "cant": 1, "precio": 235, "desc": false}, {"id": "g008", "concepto": "SECADOR + ROTR", "cat": "Accesorios", "cant": 1, "precio": 120, "desc": false}], "impresiones": [], "notas": "CONTACTOS\n- Isaac Dani Fernandez\n- Roser\n- Imantosh\n\nPROVEEDORES / ALMACÉN\n- WURTH CINTA, BRIDAS, PILAS Y COMERCIAL JAUME SONALL\n\nIDEAS / PRODUCTOS PENDIENTES\n- MA3 BRACKET HOLDER\n- FLIGHTCASE PORTAPUAS\n- Jose MAria\n\nENLACES DE CAJAS\n- Caja de cartón canal doble 35 x 22 x 20 cm: https://share.google/AEuFgbQkZtj1U1vS9\n- CAJA CON SOLAPAS 40X30X30 SIMPLE: https://share.google/j1zEWQJs3KeuoJx9C\n\nOTROS DATOS DE STOCK\n- Truss 1x: 2\n- TRUSS 2x: 2\n- AMARILLO: 10\n- AZUL ELECTICO: 2\n- LILA: 2\n- Tramos truss (TRUSS 2x × 2 + Truss 1x): 6\n\nPIEZAS INTERNAS (de tu hoja COSTE FABRICACION, sin coste todavía)\n- BASE TRUSS M\n- BASE TRUSS L\n- PACK 4 PASADORES\n- PASACABLE\n- TAPA PASACABLE\n- SOPORTE PC MA3 BASE\n- SOPORTE PC MA3 PATAS", "meta": {"lastBackup": null, "slotMap": {}}};
+const LS='ept_gestion_v1';
+const MATS=['PLA','PETG','TPU','OLD'];
+const CATS=['Impresora','Filamento','Web','Equipamiento','Accesorios','Otros'];
+const ESTADOS=['Pendiente','Enviado','Cobrado','Cancelado'];
+const TIPOS=['Básico','Mate','Silk','Plus','Translúcido','Madera','Fibra de carbono','Flexible','Antiguo'];
+
+/* ---------- utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const n=parseFloat(String(v==null?'':v).replace(',','.'));return isFinite(n)?n:0};
+const NF=(o)=>new Intl.NumberFormat('es-ES',o);
+const eur=n=>NF({style:'currency',currency:'EUR'}).format(n||0);
+const eur3=n=>NF({style:'currency',currency:'EUR',minimumFractionDigits:3,maximumFractionDigits:3}).format(n||0);
+const n0=n=>NF({maximumFractionDigits:0}).format(n||0);
+const n1=n=>NF({maximumFractionDigits:1}).format(n||0);
+const pct=n=>NF({style:'percent',maximumFractionDigits:1}).format(n||0);
+const rl=n=>n1(n)+(Math.abs(n-1)<0.05?' rollo':' rollos');
+const uid=p=>p+Math.random().toString(36).slice(2,9);
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,10);
+const fdate=d=>{if(!d)return'';const [y,m,dd]=d.split('-');return dd+'/'+m+'/'+y};
+const isMob=()=>matchMedia('(max-width:700px)').matches;
+const SYM={ok:'●',low:'▲',out:'✖',neu:'○',info:'◆'};
+const chip=(k,t)=>`<span class="chip ${k}">${SYM[k]} ${esc(t)}</span>`;
+const NAMED=[['negro',0,0,0],['blanco',255,255,255],['gris',128,128,128],['gris claro',200,200,200],['rojo',220,30,30],['naranja',255,130,0],['amarillo',255,220,0],['verde',0,160,60],['verde lima',150,220,40],['turquesa',0,190,190],['azul',20,90,240],['azul marino',10,20,110],['azul claro',120,190,250],['morado',120,40,190],['rosa',250,100,170],['marrón',120,75,35],['beige',232,216,184],['dorado',212,175,55],['plata',192,192,192]];
+function hexName(h){const m=/^#?([0-9a-f]{6})/i.exec(h||'');if(!m)return'color desconocido';const n=parseInt(m[1],16),r=n>>16,g=(n>>8)&255,b=n&255;let best='',bd=1e9;for(const[nm,R,G,B]of NAMED){const d=(r-R)**2+(g-G)**2+(b-B)**2;if(d<bd){bd=d;best=nm}}return best}
+const GUESS=[['translucent transp|transp',null],['ice blue|sky blue|azul claro','#8EC8F0'],['dark blue|marino','#1B2A7A'],['cobalto','#1F4FB8'],['blue gray','#6C7F95'],['cyan|turquesa','#14B8C8'],['azul|blue','#2A5CFF'],['fucsia|rosa','#E8338F'],['purpura|púrpura|malva|morado','#7B3FB0'],['naranja','#FF7F1A'],['amarill|yellow','#FFD21F'],['rojo|red','#D62828'],['verde','#1FA05A'],['oscuro|dark gray|gris oscuro','#606068'],['silver gray','#9EA3A8'],['plateado|silver|plata','#C0C4CA'],['dorado|gold|oro','#D4AF37'],['marfil|ivory','#F1EAD2'],['beis|beige','#E0CFA9'],['cf elegoo|carbon','#2B2B30'],['jade|blanco|white','#F5F5F5'],['negro|black','#1A1A1A'],['roble','#B07A3E'],['acacia|wood|madera','#A5733A']];
+function guessHex(name){const n=(name||'').toLowerCase();for(const[k,h]of GUESS){if(k.split('|').some(w=>n.includes(w)))return h||'#DDE6EE'}return''}
+const fHex=f=>f.hex||guessHex(f.color);
+const fSw=(f,big)=>{const h=fHex(f);return h?`<i class="cdot ${big?'big':''}" style="background:${esc(h)}" title="${esc(hexName(h))}"></i>`:'<i class="cdot none" title="sin color">?</i>'};
+const fColName=f=>{const h=fHex(f);return h?'≈ '+hexName(h):'sin color'};
+
+/* ---------- estado y persistencia ---------- */
+let memOnly=false;
+function fix(d){
+  d.ajustes=Object.assign({},SEED.ajustes,d.ajustes);
+  d.embalaje=Object.assign({},SEED.embalaje,d.embalaje);
+  ['filamentos','productos','pedidos','gastos','impresiones'].forEach(k=>{d[k]=d[k]||[]});
+  d.filamentos.forEach(f=>{if(!Array.isArray(f.etiquetas))f.etiquetas=f.tipo?[f.tipo]:[]});
+  d.filamentos.forEach(f=>{if(f.hex==null)f.hex=guessHex(f.color)});
+  d.notas=d.notas==null?'':d.notas;
+  d.meta=Object.assign({lastBackup:null,slotMap:{}},d.meta);
+  return d;
+}
+function load(){
+  try{const r=localStorage.getItem(LS);if(r)return fix(JSON.parse(r));}catch(e){}
+  return fix(JSON.parse(JSON.stringify(SEED)));
+}
+let S=load();
+function save(){
+  try{localStorage.setItem(LS,JSON.stringify(S));}
+  catch(e){if(!memOnly){memOnly=true;toast('⚠ Este navegador no deja guardar. Exporta una copia desde Ajustes.');}}
+}
+let TAB=(location.hash||'#panel').slice(1);
+
+/* ---------- cálculos ---------- */
+const AJ=()=>S.ajustes;
+const fil=id=>S.filamentos.find(f=>f.id===id);
+const prod=id=>S.productos.find(p=>p.id===id);
+const rollPrice=f=>(f&&num(f.precio)>0)?num(f.precio):num(AJ().precioKg);
+const pG=f=>rollPrice(f)/1000;
+function sold(p){return S.pedidos.filter(o=>o.producto===p.id&&(o.estado==='Enviado'||o.estado==='Cobrado')).reduce((a,o)=>a+num(o.cant),0)}
+function made(p){return num(p.fabAnt)+S.impresiones.filter(i=>i.productoId===p.id).reduce((a,i)=>a+num(i.buenas),0)}
+function vend(p){return num(p.vendAnt)+sold(p)}
+function inPacks(p){return S.productos.filter(q=>q.tipo==='Pack'&&q.base===p.id).reduce((a,q)=>a+vend(q)*num(q.uds),0)}
+function stockP(p){return made(p)-vend(p)-num(p.regalados)-inPacks(p)}
+function costeCalc(p){
+  const f=p.ficha;if(!f||!num(f.piezas))return null;
+  const plast=num(f.plasticoManual)>0?num(f.plasticoManual):(f.fils||[]).reduce((a,x)=>a+num(x.g)*pG(fil(x.fid)),0);
+  const h=num(f.horas),per=num(AJ().impresora)/Math.max(1,num(AJ().vida));
+  return (plast*(1+num(AJ().merma))+h*num(AJ().elec)+h*per+num(f.extras))/num(f.piezas);
+}
+function costeUsado(p){
+  if(p.tipo==='Pack'){const b=prod(p.base);return b?costeUsado(b)*num(p.uds):0}
+  if(p.costeManual!==null&&p.costeManual!==''&&p.costeManual!==undefined)return num(p.costeManual);
+  const c=costeCalc(p);return c==null?0:c;
+}
+function embCost(p){const e=p.ficha&&p.ficha.embalaje;return e==='sobre'?num(S.embalaje.sobre):e==='caja'?num(S.embalaje.caja):0}
+function costeTotal(p){return costeUsado(p)+(p.tipo==='Pack'?0:embCost(p))}
+function sugerido(c){return c>0?Math.ceil(c/(1-Math.min(.95,num(AJ().margen))))-0.01:null}
+function pstats(p){
+  const isPack=p.tipo==='Pack',v=vend(p),cu=costeUsado(p),ing=num(p.precio)*v;
+  let ben=null,st=null,estado='',mk=null;
+  if(!isPack){
+    const packIng=S.productos.filter(q=>q.tipo==='Pack'&&q.base===p.id).reduce((a,q)=>a+num(q.precio)*vend(q),0);
+    mk=made(p);
+    ben=ing-mk*cu-(AJ().regalados==='Sí'?num(p.regalados)*cu:0)-num(p.extra)+packIng;
+    st=stockP(p);
+    estado=st<0?'REVISAR STOCK':(mk===0&&v===0)?'Sin producir':st===0?'Agotado':'En stock';
+  }
+  return{v,cu,ing,ben,st,estado,mk};
+}
+function fEstado(f){const g=num(f.gramos),m=num(f.minimo)*1000;if(g<=0)return['out','AGOTADO'];if(m>0&&g<=m)return['low','BAJO'];return['ok','OK']}
+const oTotal=o=>{const p=prod(o.producto);return num(o.cant)*(p?num(p.precio):0)*(1-num(o.desc)/100)};
+const oCoste=o=>{const p=prod(o.producto);return p?num(o.cant)*costeUsado(p):0};
+const gTotal=g=>num(g.cant)*num(g.precio);
+
+/* ---------- interfaz general ---------- */
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3800)}
+const NAV=[['panel','Panel'],['imprimir','Imprimir'],['productos','Productos'],['pedidos','Pedidos'],['filamento','Filamento'],['gastos','Gastos'],['notas','Notas'],['ajustes','Ajustes']];
+function themePref(){try{return localStorage.getItem('ept_tema')||'auto'}catch(e){return'auto'}}
+function applyTheme(){
+  const p=themePref(),dark=p==='oscuro'||(p==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);
+  document.documentElement.dataset.theme=dark?'dark':'light';
+  const m=document.querySelector('meta[name=theme-color]');if(m)m.content=dark?'#0B0B0F':'#1E1E24';
+  const b=$('#tbtn');if(b)b.textContent=p==='auto'?'◐ Auto':p==='oscuro'?'🌙 Oscuro':'☀ Claro';
+}
+function cycleTheme(){const o=['auto','oscuro','claro'];try{localStorage.setItem('ept_tema',o[(o.indexOf(themePref())+1)%3])}catch(e){}applyTheme()}
+matchMedia('(max-width:700px)').addEventListener('change',()=>render());
+matchMedia('(prefers-color-scheme:dark)').addEventListener('change',applyTheme);
+const BNAV=[['panel','📊','Panel'],['imprimir','🖨️','Imprimir'],['filamento','🧵','Filamento'],['productos','📦','Productos'],['mas','☰','Más']];
+function go(k){if(location.hash.slice(1)===k){TAB=k;render()}else location.hash=k}
+window.addEventListener('hashchange',()=>{TAB=location.hash.slice(1);render();window.scrollTo(0,0)});
+function render(){
+  const VIEWS={mas:vMas,panel:vPanel,imprimir:vImprimir,productos:vProductos,pedidos:vPedidos,filamento:vFilamento,gastos:vGastos,notas:vNotas,ajustes:vAjustes};
+  if(!VIEWS[TAB])TAB='panel';
+  $('#nav').innerHTML=NAV.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="go('${k}')">${l}</button>`).join('');
+  const bt=['pedidos','gastos','notas','ajustes'].includes(TAB)?'mas':TAB;
+  $('#bnav').innerHTML=BNAV.map(([k,i,l])=>`<button class="${k===bt?'on':''}" onclick="go('${k}')"><span>${i}</span>${l}</button>`).join('');
+  $('#view').innerHTML=VIEWS[TAB]();
+  const b=S.meta.lastBackup,days=b?(Date.now()-new Date(b).getTime())/864e5:999;
+  $('#banner').innerHTML=days>14?`<p class="banner"><span>💾 Tus datos viven solo en este navegador y ${b?'la última copia es de hace '+Math.floor(days)+' días':'aún no has hecho ninguna copia'}.</span><button class="btn ghost" onclick="exportJSON()">Exportar copia ahora</button></p>`:'';
+  if(TAB==='imprimir')pdUpd();
+}
+let MOD=null;
+function modal(title,body,onSave,opts){
+  opts=opts||{};MOD=onSave;
+  $('#modal-root').innerHTML=`<div class="ov" onmousedown="if(event.target===this)closeModal()"><div class="mod"><div class="mh"><b>${title}</b><button class="x" onclick="closeModal()" aria-label="Cerrar">✕</button></div><div class="mb">${body}</div><div class="mf">${opts.extra||''}<span class="sp"></span><button class="btn ghost" onclick="closeModal()">Cancelar</button><button class="btn ${opts.cls||'blue'}" onclick="MOD&&MOD()">${opts.saveText||'Guardar'}</button></div></div></div>`;
+}
+function closeModal(){$('#modal-root').innerHTML='';MOD=null}
+function ask(title,html,okFn,okText){modal(esc(title),html,()=>{closeModal();okFn()},{saveText:okText||'Aceptar',cls:'blue'})}
+const fv=n=>{const e=document.querySelector('#mform [name="'+n+'"]');return e?(e.type==='checkbox'?e.checked:e.value):''};
+function opts(list,sel){return list.map(x=>{const v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;return`<option value="${esc(v)}" ${v===sel?'selected':''}>${esc(l)}</option>`}).join('')}
+
+/* ---------- editor de filamentos (ficha e imprimir) ---------- */
+const ED={};
+function matList(){const s=new Set(MATS);S.filamentos.forEach(f=>f.material&&s.add(f.material));return[...s]}
+function filOptions(sel){
+  let h='<option value="">— elige filamento —</option>';
+  matList().forEach(m=>{
+    const it=S.filamentos.filter(f=>f.material===m&&f.color);
+    if(it.length)h+=`<optgroup label="${esc(m)}">`+it.map(f=>`<option value="${f.id}" ${f.id===sel?'selected':''}>${esc(f.color)}${f.marca?' · '+esc(f.marca):''} — ${n0(f.gramos)} g</option>`).join('')+'</optgroup>';
+  });
+  return h;
+}
+function edInit(id,rows,mode,onChange){ED[id]={rows,mode,onChange}}
+function edHtml(id){return`<div id="ed_${id}">${edInner(id)}</div>`}
+function edInner(id){
+  const e=ED[id],pr=e.mode==='print';let h='';
+  e.rows.forEach((r,i)=>{
+    h+=`<div class="edrow ${pr?'pr':''}"><div class="edsel"><label>Filamento ${i+1}<select onchange="edSel('${id}',${i},this.value)">${filOptions(r.fid)}</select></label>${r.hint?`<div class="hint">${r.sw?`<i class="sw" style="background:${esc(r.sw)}"></i>`:''}${esc(r.hint)}</div>`:''}${(()=>{const ff=r.fid&&fil(r.fid);return ff?`<div class="hint" style="display:flex;align-items:center;gap:8px;margin-top:4px">${fSw(ff)} ${fColName(ff)}</div>`:''})()}</div>
+    <label>${pr?'g por tanda':'Gramos'}<input type="number" min="0" step="any" inputmode="decimal" value="${r.g===''||r.g==null?'':esc(r.g)}" oninput="edG('${id}',${i},this.value)"></label>
+    ${pr?`<div class="edc"><span>Se restan</span><b id="ed_${id}_t${i}">–</b></div><div class="edc"><span>Quedarán</span><b id="ed_${id}_r${i}">–</b></div>`:''}
+    <button class="ico" title="Quitar" aria-label="Quitar filamento" onclick="edDel('${id}',${i})">✕</button></div>`;
+  });
+  return h+`<button class="btn ghost" onclick="edAdd('${id}')">+ Añadir filamento</button>`;
+}
+function edRender(id){const e=ED[id];$('#ed_'+id).innerHTML=edInner(id);edCells(id);if(e.onChange)e.onChange()}
+function edAdd(id){ED[id].rows.push({fid:'',g:'',hint:'',sw:''});edRender(id)}
+function edDel(id,i){const r=ED[id].rows;r.splice(i,1);if(!r.length&&ED[id].mode==='print')r.push({fid:'',g:'',hint:'',sw:''});edRender(id)}
+function edSel(id,i,v){ED[id].rows[i].fid=v;edRender(id)}
+function edG(id,i,v){const e=ED[id];e.rows[i].g=v;edCells(id);if(e.onChange)e.onChange()}
+function edCells(id){
+  const e=ED[id];if(!e||e.mode!=='print')return;
+  const T=Math.max(0,num(PD.tandas)),agg={};
+  e.rows.forEach(r=>{if(r.fid)agg[r.fid]=(agg[r.fid]||0)+num(r.g)*T});
+  e.rows.forEach((r,i)=>{
+    const t=$('#ed_'+id+'_t'+i),q=$('#ed_'+id+'_r'+i);if(!t||!q)return;
+    t.textContent=n1(num(r.g)*T)+' g';
+    const f=fil(r.fid);
+    if(!f){q.textContent='–';q.className='';return}
+    const rem=num(f.gramos)-agg[r.fid];q.textContent=n0(rem)+' g';q.className=rem<0?'neg':'';
+  });
+}
+
+/* ---------- PANEL ---------- */
+function vPanel(){
+  const rows=S.productos.map(p=>({p,s:pstats(p)}));
+  const ingresos=rows.reduce((a,r)=>a+r.s.ing,0);
+  const benef=rows.reduce((a,r)=>a+(r.s.ben||0),0);
+  const gastosD=S.gastos.filter(g=>g.desc).reduce((a,g)=>a+gTotal(g),0);
+  const real=benef-gastosD,rec=gastosD>0?Math.max(0,benef)/gastosD:0;
+  const valor=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0);
+  const rollos=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000,0);
+  const alert=S.filamentos.filter(f=>f.color&&fEstado(f)[0]!=='ok');
+  const pend=S.pedidos.filter(o=>o.estado==='Pendiente').length;
+  const porCobrar=S.pedidos.filter(o=>o.estado==='Enviado').reduce((a,o)=>a+oTotal(o),0);
+  const unidades=rows.reduce((a,r)=>a+(r.p.tipo==='Pack'?0:r.s.v),0);
+  const top=rows.filter(r=>r.s.ben!==null).sort((a,b)=>b.s.ben-a.s.ben).slice(0,8);
+  const maxB=Math.max(1,...top.map(r=>Math.abs(r.s.ben)));
+  const cats={};S.gastos.filter(g=>g.desc).forEach(g=>{cats[g.cat]=(cats[g.cat]||0)+gTotal(g)});
+  const catE=Object.entries(cats).sort((a,b)=>b[1]-a[1]),maxC=Math.max(1,...catE.map(c=>c[1]));
+  const neg=rows.filter(r=>r.s.estado==='REVISAR STOCK').length;
+  const sinPrecio=S.filamentos.filter(f=>f.color&&f.material!=='OLD'&&!num(f.precio)).length;
+  const sinCoste=rows.filter(r=>r.p.tipo!=='Pack'&&num(r.p.precio)>0&&r.s.cu===0).length;
+  const mats=matList().map(m=>{const it=S.filamentos.filter(f=>f.material===m);return{m,n:it.reduce((a,f)=>a+num(f.gramos)/1000,0),v:it.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),a:it.filter(f=>f.color&&fEstado(f)[0]!=='ok').length}}).filter(x=>x.n||x.a);
+  const last=S.impresiones.slice().sort((a,b)=>(b.fecha+b.id).localeCompare(a.fecha+a.id)).slice(0,5);
+  return`<h2>Panel</h2><p class="sub">Resumen de ventas, gastos y stock. Se calcula solo con lo que apuntas en las demás pestañas.</p>
+  <div class="kpis">
+   <div class="kpi"><small>Ingresos por ventas</small><b>${eur(ingresos)}</b><em>${n0(unidades)} unidades vendidas</em></div>
+   <div class="kpi"><small>Beneficio de ventas</small><b>${eur(benef)}</b><em>Antes de gastos</em></div>
+   <div class="kpi"><small>Gastos descontados</small><b>${eur(gastosD)}</b><em>Los marcados "Descuenta: Sí"</em></div>
+   <div class="kpi y"><small>Beneficio real</small><b class="${real<0?'neg':''}">${eur(real)}</b><em>${real>=0?chip('ok','EN BENEFICIO'):chip('low','EN PÉRDIDA (inversión sin recuperar)')}</em></div>
+   <div class="kpi"><small>Inversión recuperada</small><b>${pct(rec)}</b><em>${real>=0?'Ya recuperada':'Faltan '+eur(-real)+' para el equilibrio'}</em></div>
+   <div class="kpi"><small>Valor stock de filamento</small><b>${eur(valor)}</b><em>${rl(rollos)} equivalentes</em></div>
+   <div class="kpi"><small>Filamento a reponer</small><b>${alert.length}</b><em>Agotados: ${alert.filter(f=>fEstado(f)[0]==='out').length} · Bajos: ${alert.filter(f=>fEstado(f)[0]==='low').length}</em></div>
+   <div class="kpi"><small>Pedidos pendientes</small><b>${pend}</b><em>Por cobrar (enviados): ${eur(porCobrar)}</em></div>
+  </div>
+  <div class="grid2">
+   <section class="card dark"><h3>Filamento a reponer (agotado o en el mínimo)</h3>
+    ${alert.length?`<div class="tw"><table><tr><th class="l">Color / referencia</th><th>Material</th><th>Quedan</th><th>Estado</th></tr>${alert.slice(0,10).map(f=>{const[k,t]=fEstado(f);return`<tr><td class="l">${esc(f.color)}${f.marca?' · '+esc(f.marca):''}</td><td>${esc(f.material)}</td><td>${n0(f.gramos)} g</td><td>${chip(k,t)}</td></tr>`}).join('')}</table></div>${alert.length>10?`<p class="hint">… y ${alert.length-10} más (míralos en Filamento)</p>`:''}`:'<p>'+chip('ok','Sin alertas: todo en orden')+'</p>'}
+   </section>
+   <section class="card"><h3>Top 8 productos por beneficio</h3>
+    ${top.map(r=>`<div class="hbar"><span class="n" title="${esc(r.p.nombre)}">${esc(r.p.nombre)}</span><span class="b"><i style="width:${Math.max(2,Math.abs(r.s.ben)/maxB*100)}%"></i></span><span class="v ${r.s.ben<0?'neg':''}">${eur(r.s.ben)}</span></div>`).join('')||'<p class="hint">Aún no hay productos.</p>'}
+   </section>
+  </div>
+  <div class="grid2">
+   <section class="card"><h3>Gastos por categoría</h3>
+    ${catE.map(([c,v])=>`<div class="hbar y"><span class="n">${esc(c)}</span><span class="b"><i style="width:${Math.max(2,v/maxC*100)}%"></i></span><span class="v">${eur(v)}</span></div>`).join('')||'<p class="hint">Sin gastos.</p>'}
+    <p class="hint">Total: ${eur(gastosD)}</p>
+   </section>
+   <section class="card dark"><h3>Stock de filamento por material</h3>
+    <div class="tw"><table><tr><th class="l">Material</th><th>Rollos</th><th>Valor stock</th><th>Alertas</th></tr>
+    ${mats.map(x=>`<tr><td class="l">${esc(x.m)}</td><td>${n1(x.n)}</td><td>${eur(x.v)}</td><td>${x.a}</td></tr>`).join('')}
+    <tr class="tot"><td class="l">TOTAL</td><td>${n1(rollos)}</td><td>${eur(valor)}</td><td>${alert.length}</td></tr></table></div>
+   </section>
+  </div>
+  <div class="grid2">
+   <section class="card"><h3>Últimas impresiones</h3>
+    ${last.map(i=>`<div class="sumrow"><span>${fdate(i.fecha)} · ${esc(impName(i))}</span><b>${n0(i.tandas)} tanda(s) · ${n0(i.consumo.reduce((a,c)=>a+num(c.g),0))} g</b></div>`).join('')||'<p class="hint">Todavía no has registrado ninguna. Ve a <a href="#imprimir">Imprimir</a>.</p>'}
+   </section>
+   <section class="card"><h3>Avisos de datos</h3>
+    <div class="sumrow"><span>Productos con stock negativo</span><b>${neg?chip('out','REVISAR ('+neg+')'):chip('ok','OK')}</b></div>
+    <div class="sumrow"><span>Rollos sin precio</span><b>${sinPrecio?chip('low','REVISAR ('+sinPrecio+')'):chip('ok','OK')}</b></div>
+    <div class="sumrow"><span>Productos con precio pero sin coste</span><b>${sinCoste?chip('low','REVISAR ('+sinCoste+')'):chip('ok','OK')}</b></div>
+   </section>
+  </div>`;
+}
+const impName=i=>{const p=prod(i.productoId);return p?p.nombre:(i.etiqueta||'Sin producto')};
+
+/* ---------- IMPRIMIR ---------- */
+function newDraft(){return{productoId:'',etiqueta:'',tandas:1,piezas:1,fallos:0,horas:'',fecha:today(),nota:'',rows:[{fid:'',g:'',hint:'',sw:''}]}}
+let PD=newDraft();
+function vImprimir(){
+  edInit('pd',PD.rows,'print',pdUpd);
+  const ps=S.productos.filter(p=>p.tipo!=='Pack');
+  const hist=S.impresiones.slice().sort((a,b)=>(b.fecha+b.id).localeCompare(a.fecha+a.id)).slice(0,25);
+  return`<h2>Imprimir</h2><p class="sub">Apunta lo que vas a imprimir en la Bambu Lab y los gramos de cada filamento: al registrarlo se restan del stock. Puedes escribirlo a mano o leerlo del archivo laminado de Bambu Studio.</p>
+  <div class="grid2">
+   <div>
+    <section class="card"><h3>1 · Qué imprimes</h3>
+     <div class="fg">
+      <label class="w2">Producto<select onchange="pdProd(this.value)"><option value="">— Sin producto (prueba / otro) —</option>${ps.map(p=>`<option value="${p.id}" ${p.id===PD.productoId?'selected':''}>${esc(p.nombre)}</option>`).join('')}</select></label>
+      ${PD.productoId?'':`<label class="w2">Etiqueta (opcional)<input value="${esc(PD.etiqueta)}" oninput="PD.etiqueta=this.value" placeholder="Ej. prueba de calibración"></label>`}
+      <label>Fecha<input type="date" value="${esc(PD.fecha)}" oninput="PD.fecha=this.value"></label>
+      <label>Tandas (placas)<input type="number" min="0" step="1" inputmode="numeric" value="${esc(PD.tandas)}" oninput="PD.tandas=this.value;pdUpd()"></label>
+      <label>Piezas por tanda<input type="number" min="0" step="1" inputmode="numeric" value="${esc(PD.piezas)}" oninput="PD.piezas=this.value;pdUpd()"></label>
+      <label>Fallos (piezas)<input type="number" min="0" step="1" inputmode="numeric" value="${esc(PD.fallos)}" oninput="PD.fallos=this.value;pdUpd()"></label>
+      <label>Horas por tanda<input type="number" min="0" step="any" inputmode="decimal" value="${esc(PD.horas)}" oninput="PD.horas=this.value;pdUpd()"></label>
+      <label class="wall">Nota<input value="${esc(PD.nota)}" oninput="PD.nota=this.value" placeholder="Opcional"></label>
+     </div>
+     ${PD.productoId?'<p class="hint">Se ha cargado la receta de la ficha del producto (filamentos y piezas por tanda). Puedes cambiarla para esta impresión.</p>':''}
+    </section>
+    <section class="card"><h3>2 · Filamentos y gramos</h3>
+     <div class="bar"><button class="btn ghost" onclick="$('#f3mf').click()">📂 Leer archivo de Bambu Studio (.3mf)</button></div>
+     <p class="hint" style="margin-top:-4px">Exporta en Bambu Studio "Export plate sliced file" (.gcode.3mf). Lee los gramos de cada ranura; tú eliges a qué rollo del stock corresponde cada una. Si no tienes el archivo, escribe los gramos a mano.</p>
+     ${edHtml('pd')}
+     <p class="hint">Los gramos son <b>por tanda</b>. Se restan multiplicados por el número de tandas.</p>
+    </section>
+   </div>
+   <div>
+    <section class="card dark" style="position:sticky;top:112px"><h3>3 · Resumen</h3><div id="psum"></div>
+     <button class="btn blue big" style="margin-top:12px" onclick="pdRegister()">Registrar impresión y restar filamento</button>
+    </section>
+   </div>
+  </div>
+  <section class="card"><h3>Historial de impresiones</h3>
+   ${hist.map(i=>`<div class="hist"><div class="m"><b>${fdate(i.fecha)} · ${esc(impName(i))}</b><div class="hint">${n0(i.tandas)} tanda(s) · ${n0(i.buenas)} pieza(s) buena(s)${num(i.fallos)?' · '+n0(i.fallos)+' fallo(s)':''}${i.horas?' · '+n1(i.horas)+' h':''}${i.nota?' · '+esc(i.nota):''}</div><div>${i.consumo.map(c=>{const f=fil(c.fid);return`<span class="pill">${esc(f?f.color:'(filamento borrado)')}: ${n1(c.g)} g</span>`}).join('')}</div></div><div><button class="ico" onclick="pdUndo('${i.id}')">↩ Deshacer</button></div></div>`).join('')||'<p class="hint">Aún no hay impresiones registradas.</p>'}
+  </section>`;
+}
+function pdProd(id){
+  PD.productoId=id;const p=prod(id);
+  if(p){
+    const f=p.ficha||{};PD.piezas=num(f.piezas)||1;
+    PD.rows=(f.fils||[]).map(x=>({fid:x.fid,g:num(x.g)>0?x.g:'',hint:'',sw:''}));
+    if(!PD.rows.length)PD.rows=[{fid:'',g:'',hint:'',sw:''}];
+    if(num(f.horas))PD.horas=f.horas;
+  }
+  render();
+}
+function pdTotals(){
+  const T=Math.max(0,num(PD.tandas)),rows=PD.rows.filter(r=>r.fid&&num(r.g)>0);
+  const agg={};let g=0,cost=0;
+  rows.forEach(r=>{const x=num(r.g)*T;agg[r.fid]=(agg[r.fid]||0)+x;g+=x;cost+=x*pG(fil(r.fid))});
+  return{T,rows,agg,g,cost,buenas:Math.max(0,T*num(PD.piezas)-num(PD.fallos))};
+}
+function pdUpd(){
+  const el=$('#psum');if(!el)return;
+  const t=pdTotals();edCells('pd');
+  const lines=Object.entries(t.agg).map(([id,g])=>{
+    const f=fil(id),after=num(f.gramos)-g;
+    let ch=after<0?chip('out','SIN STOCK SUFICIENTE'):(num(f.minimo)>0&&after<=num(f.minimo)*1000)?chip('low','QUEDARÁ BAJO'):'';
+    return`<div class="sumrow"><span>${esc(f.color)}</span><b>${n0(f.gramos)} → <span class="${after<0?'neg':''}">${n0(after)} g</span> ${ch}</b></div>`;
+  }).join('');
+  el.innerHTML=`<div class="sumrow"><span>Piezas buenas</span><b>${n0(num(PD.tandas))} × ${n0(num(PD.piezas))} − ${n0(num(PD.fallos))} = ${n0(t.buenas)}</b></div>
+   <div class="sumrow"><span>Filamento total a restar</span><b>${n1(t.g)} g</b></div>
+   <div class="sumrow"><span>Coste del plástico (sin merma)</span><b>${eur(t.cost)}</b></div>
+   <div class="sumrow"><span>Plástico por pieza buena</span><b>${t.buenas?eur(t.cost/t.buenas):'–'}</b></div>
+   ${PD.horas?`<div class="sumrow"><span>Tiempo total</span><b>${n1(num(PD.horas)*t.T)} h</b></div>`:''}
+   <h3 style="margin:12px 0 4px">Stock de filamento</h3>${lines||'<p class="hint">Elige filamentos y gramos.</p>'}`;
+}
+function pdRegister(){
+  const t=pdTotals();
+  if(!t.rows.length||t.T<=0){toast('Elige al menos un filamento, sus gramos y las tandas.');return}
+  const short=Object.entries(t.agg).filter(([id,g])=>g>num(fil(id).gramos));
+  const go_=()=>{
+    Object.entries(t.agg).forEach(([id,g])=>{const f=fil(id);f.gramos=Math.round((num(f.gramos)-g)*10)/10});
+    t.rows.forEach(r=>{if(r.key)S.meta.slotMap[r.key]=r.fid});
+    S.impresiones.push({id:uid('i'),fecha:PD.fecha||today(),productoId:PD.productoId||null,etiqueta:PD.etiqueta||'',tandas:t.T,piezas:num(PD.piezas),fallos:num(PD.fallos),buenas:t.buenas,horas:num(PD.horas)?num(PD.horas)*t.T:0,nota:PD.nota,costePlastico:t.cost,consumo:Object.entries(t.agg).map(([fid,g])=>({fid,g:Math.round(g*10)/10}))});
+    save();const fecha=PD.fecha;PD=newDraft();PD.fecha=fecha;toast('✔ Impresión registrada y filamento restado');render();
+  };
+  if(short.length)ask('Stock insuficiente',`<p>No hay gramos suficientes de:</p><ul>${short.map(([id,g])=>`<li>${esc(fil(id).color)}: hay ${n0(fil(id).gramos)} g y se restan ${n0(g)} g</li>`).join('')}</ul><p>Si continúas, el stock quedará en negativo. Revisa el recuento del rollo.</p>`,go_,'Registrar igualmente');
+  else go_();
+}
+function pdUndo(id){
+  const i=S.impresiones.find(x=>x.id===id);if(!i)return;
+  ask('Deshacer impresión',`<p>Se borrará esta impresión (${fdate(i.fecha)} · ${esc(impName(i))}) y se devolverán al stock los gramos restados.</p>`,()=>{
+    i.consumo.forEach(c=>{const f=fil(c.fid);if(f)f.gramos=Math.round((num(f.gramos)+num(c.g))*10)/10});
+    S.impresiones=S.impresiones.filter(x=>x.id!==id);save();toast('Impresión deshecha');render();
+  },'Deshacer');
+}
+/* lectura de .3mf de Bambu Studio (zip sin librerías) */
+function zipEntries(buf){
+  const dv=new DataView(buf);let e=-1;
+  for(let i=buf.byteLength-22;i>=Math.max(0,buf.byteLength-65557);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw new Error('El archivo no es un .3mf válido');
+  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out={};
+  for(let k=0;k<n;k++){
+    if(dv.getUint32(p,true)!==0x02014b50)break;
+    const method=dv.getUint16(p+10,true),csize=dv.getUint32(p+20,true),nl=dv.getUint16(p+28,true),el=dv.getUint16(p+30,true),cl=dv.getUint16(p+32,true),lho=dv.getUint32(p+42,true);
+    out[new TextDecoder().decode(new Uint8Array(buf,p+46,nl))]={method,csize,lho};p+=46+nl+el+cl;
+  }
+  return out;
+}
+async function zipRead(buf,en){
+  const dv=new DataView(buf),start=en.lho+30+dv.getUint16(en.lho+26,true)+dv.getUint16(en.lho+28,true),data=new Uint8Array(buf,start,en.csize);
+  if(en.method===0)return data;
+  if(en.method!==8)throw new Error('Compresión del .3mf no soportada');
+  const s=new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(s).arrayBuffer());
+}
+async function parse3mf(buf){
+  const ents=zipEntries(buf),name=Object.keys(ents).find(n=>/slice_info\.config$/i.test(n));
+  if(!name)throw new Error('Este .3mf no trae datos de laminado. Exporta "Plate sliced file" (.gcode.3mf) desde Bambu Studio.');
+  const xml=new TextDecoder().decode(await zipRead(buf,ents[name]));
+  const doc=new DOMParser().parseFromString(xml,'application/xml');
+  const plate=doc.querySelector('plate');if(!plate)throw new Error('No encuentro la placa en el archivo.');
+  const meta={};plate.querySelectorAll('metadata').forEach(m=>{meta[m.getAttribute('key')]=m.getAttribute('value')});
+  const slots=[...plate.querySelectorAll('filament')].map(f=>({id:f.getAttribute('id'),type:f.getAttribute('type')||'',color:(f.getAttribute('color')||'').toUpperCase(),g:num(f.getAttribute('used_g'))})).filter(s=>s.g>0);
+  if(!slots.length)throw new Error('El archivo no indica gramos usados. Vuelve a laminar y exporta el archivo de la placa.');
+  return{slots,total:slots.reduce((a,s)=>a+s.g,0),hours:num(meta.prediction)/3600};
+}
+async function pdImport(file){
+  if(!file)return;
+  try{
+    const info=await parse3mf(await file.arrayBuffer());
+    PD.rows=info.slots.map(s=>{const key=s.type+'|'+s.color,fid=S.meta.slotMap[key];return{fid:fil(fid)?fid:'',g:Math.round(s.g*100)/100,hint:`Ranura ${s.id} · ${s.type||'?'} · ≈ ${hexName(s.color)} (${s.color})`,sw:s.color,key}});
+    PD.tandas=1;if(info.hours)PD.horas=Math.round(info.hours*100)/100;
+    if(!PD.nota)PD.nota='Archivo: '+file.name;
+    toast(`Leído: ${info.slots.length} filamento(s), ${n0(info.total)} g por tanda`);render();
+  }catch(e){toast('⚠ '+e.message)}
+}
+
+/* ---------- PRODUCTOS ---------- */
+function vProductos(){
+  const rows=S.productos.map(p=>({p,s:pstats(p)}));
+  const tot=k=>rows.reduce((a,r)=>a+(r.s[k]||0),0);
+  const ec={'En stock':'ok','Agotado':'low','REVISAR STOCK':'out','Sin producir':'neu'};
+  const head=`<h2>Productos</h2><p class="sub">Cada producto lleva su ficha interna (filamentos, tiempos, coste y precio). Las impresiones registradas suman a Fabricados, y los pedidos Enviados o Cobrados suman a Vendidos.</p>
+  <div class="bar"><button class="btn blue" onclick="openProd('')">+ Nuevo producto</button></div>`;
+  if(isMob())return head+rows.map(({p,s})=>{const pk=p.tipo==='Pack',b=prod(p.base);
+    return`<div class="lcard ${pk?'pk':''}"><div class="lr"><b>${esc(p.nombre)}</b>${pk?chip('neu','PACK'):chip(ec[s.estado],s.estado)}</div>
+    ${pk?`<div class="hint">Pack ×${n0(p.uds)} de ${b?esc(b.nombre):'?'}</div>`:''}
+    <div class="kv">${pk?'':`<span>Stock <b class="${s.st<0?'neg':''}">${n0(s.st)}</b></span><span>Fabr. <b>${n0(s.mk)}</b></span>`}<span>Vend. <b>${n0(s.v)}</b></span><span>Precio <b>${eur(p.precio)}</b></span><span>Coste <b>${eur(s.cu)}</b></span>${pk?'':`<span>Benef. <b class="${s.ben<0?'neg':''}">${eur(s.ben)}</b></span>`}</div>
+    <div class="lr"><span class="hint">${num(p.precio)>0?'Margen '+pct((num(p.precio)-s.cu)/num(p.precio)):''}</span><button class="ico" onclick="openProd('${p.id}')">Editar</button></div></div>`}).join('')
+    +`<div class="lcard tot"><div class="lr"><b>TOTAL beneficio</b><b>${eur(tot('ben'))}</b></div></div><p class="legend">Estados: ● En stock · ▲ Agotado · ✖ REVISAR STOCK (stock negativo) · ○ Sin producir.</p>`;
+  return head+`<div class="tw"><table><tr><th class="l">Producto</th><th>Fabricados</th><th>Vendidos</th><th>Regalados</th><th>Stock</th><th>Estado</th><th>Coste (€/ud)</th><th>Precio</th><th>Margen</th><th>Beneficio total</th><th></th></tr>
+  ${rows.map(({p,s})=>{const pk=p.tipo==='Pack',b=prod(p.base);return`<tr class="${pk?'pack':''}"><td class="l">${esc(p.nombre)}${pk?`<br><span class="hint">Pack ×${n0(p.uds)} de ${b?esc(b.nombre):'?'}</span>`:''}</td>
+   <td>${pk?'–':n0(s.mk)}</td><td>${n0(s.v)}</td><td>${pk?'–':n0(p.regalados)}</td><td class="${s.st<0?'neg':''}">${pk?'–':n0(s.st)}</td>
+   <td>${pk?'–':chip(ec[s.estado],s.estado)}</td><td>${eur(s.cu)}</td><td>${eur(p.precio)}</td><td>${num(p.precio)>0?pct((num(p.precio)-s.cu)/num(p.precio)):'–'}</td>
+   <td class="r ${s.ben<0?'neg':''}">${pk?'<span class="hint">incl. en base</span>':eur(s.ben)}</td><td><button class="ico" onclick="openProd('${p.id}')">Editar</button></td></tr>`}).join('')}
+  <tr class="tot"><td class="l">TOTAL</td><td>${n0(rows.reduce((a,r)=>a+(r.s.mk||0),0))}</td><td>${n0(rows.reduce((a,r)=>a+(r.p.tipo==='Pack'?0:r.s.v),0))}</td><td>${n0(rows.reduce((a,r)=>a+num(r.p.regalados),0))}</td><td>${n0(rows.reduce((a,r)=>a+(r.s.st||0),0))}</td><td colspan="4"></td><td class="r">${eur(tot('ben'))}</td><td></td></tr></table></div>
+  <p class="legend">Estados: ● En stock · ▲ Agotado · ✖ REVISAR STOCK (stock negativo) · ○ Sin producir.</p>`;
+}
+function openProd(id){
+  const p=id?prod(id):{tipo:'Producto',base:'',uds:0,fabAnt:0,vendAnt:0,regalados:0,precio:0,extra:0,costeManual:null,ficha:{}};
+  const f=p.ficha||{};
+  edInit('pf',JSON.parse(JSON.stringify(f.fils||[])).map(x=>({fid:x.fid,g:x.g,hint:'',sw:''})),'ficha',prodPreview);
+  const bases=S.productos.filter(q=>q.tipo!=='Pack'&&q.id!==id);
+  modal(id?'Editar producto':'Nuevo producto',`<form id="mform" onsubmit="return false" oninput="prodPreview()">
+   <div class="fg">
+    <label class="w2">Nombre<input name="nombre" value="${esc(p.nombre||'')}"></label>
+    <label>Tipo<select name="tipo" onchange="prodTipo()">${opts(['Producto','Pack'],p.tipo)}</select></label>
+    <label class="po">Pack de (producto base)<select name="base">${opts([['','— elige —'],...bases.map(b=>[b.id,b.nombre])],p.base)}</select></label>
+    <label class="po">Unidades por pack<input name="uds" type="number" step="1" value="${esc(p.uds||'')}"></label>
+    <label>Precio de venta (€)<input name="precio" type="number" step="any" value="${esc(p.precio)}"></label>
+    <label class="np">Coste manual €/ud (vacío = calculado)<input name="costeManual" type="number" step="any" value="${p.costeManual==null?'':esc(p.costeManual)}"></label>
+    <label class="np">Fabricados anteriores<input name="fabAnt" type="number" step="1" value="${esc(p.fabAnt)}"></label>
+    <label>Vendidos anteriores<input name="vendAnt" type="number" step="1" value="${esc(p.vendAnt)}"></label>
+    <label class="np">Regalados<input name="regalados" type="number" step="1" value="${esc(p.regalados)}"></label>
+    <label class="np">Coste extra (€)<input name="extra" type="number" step="any" value="${esc(p.extra)}"></label>
+   </div>
+   <div class="np"><h3 style="margin-top:18px">Ficha interna de impresión</h3>
+    <div class="fg">
+     <label>Horas por tanda<input name="horas" type="number" step="any" value="${esc(f.horas||'')}"></label>
+     <label>Piezas por tanda<input name="piezas" type="number" step="1" value="${esc(f.piezas||'')}"></label>
+     <label>Plástico manual (€/tanda)<input name="plasticoManual" type="number" step="any" value="${f.plasticoManual?esc(f.plasticoManual):''}"></label>
+     <label>Extras (€/tanda)<input name="extras" type="number" step="any" value="${f.extras?esc(f.extras):''}"></label>
+     <label>Embalaje<select name="embalaje">${opts([['','Ninguno'],['sobre','Sobre'],['caja','Caja']],f.embalaje||'')}</select></label>
+     <label>Perfil de impresión<input name="perfil" value="${esc(f.perfil||'')}"></label>
+     <label>Temp. boquilla / cama<input name="temp" value="${esc(f.temp||'')}"></label>
+     <label>Altura de capa<input name="capa" value="${esc(f.capa||'')}"></label>
+    </div>
+    <h3 style="margin:16px 0 8px">Filamentos de la receta (gramos por tanda)</h3>${edHtml('pf')}
+    <div class="fg" style="margin-top:12px"><label class="wall">Observaciones internas<textarea name="obs" style="min-height:70px">${esc(f.obs||'')}</textarea></label>
+    <label class="wall">Archivo / enlace (STL, 3MF…)<input name="link" value="${esc(f.link||'')}"></label></div>
+   </div>
+   <div class="note" id="pprev"></div></form>`,()=>saveProd(id),{extra:id?`<button class="btn warn" onclick="delProd('${id}')">Borrar</button>`:''});
+  prodTipo();prodPreview();
+}
+function prodTipo(){
+  const pk=fv('tipo')==='Pack';
+  document.querySelectorAll('#mform .po').forEach(e=>e.style.display=pk?'':'none');
+  document.querySelectorAll('#mform .np').forEach(e=>e.style.display=pk?'none':'');
+}
+function readProd(old){
+  const fils=ED.pf.rows.filter(r=>r.fid||num(r.g)).map(r=>({fid:r.fid,g:num(r.g)}));
+  return Object.assign({},old||{},{
+    nombre:fv('nombre').trim(),tipo:fv('tipo'),base:fv('base'),uds:num(fv('uds')),precio:num(fv('precio')),
+    costeManual:fv('costeManual')===''?null:num(fv('costeManual')),fabAnt:num(fv('fabAnt')),vendAnt:num(fv('vendAnt')),regalados:num(fv('regalados')),extra:num(fv('extra')),
+    ficha:{fils,horas:num(fv('horas')),piezas:num(fv('piezas')),plasticoManual:num(fv('plasticoManual')),extras:num(fv('extras')),embalaje:fv('embalaje'),perfil:fv('perfil'),temp:fv('temp'),capa:fv('capa'),obs:fv('obs'),link:fv('link')}
+  });
+}
+function prodPreview(){
+  const el=$('#pprev');if(!el)return;
+  const t=readProd(null);
+  if(t.tipo==='Pack'){const b=prod(t.base),cu=costeUsado(t);el.innerHTML=`Coste del pack: <b>${eur(cu)}</b>${b?` (${n0(t.uds)} × ${eur(costeUsado(b))})`:''} · Margen: <b>${t.precio>0?pct((t.precio-cu)/t.precio):'–'}</b>`;return}
+  const cc=costeCalc(t),cu=costeUsado(t),ct=costeTotal(t),sg=sugerido(ct);
+  el.innerHTML=`Coste calculado: <b>${cc==null?'– (falta piezas por tanda)':eur3(cc)}</b> · Coste usado: <b>${eur3(cu)}</b> ${t.costeManual!==null?'(manual)':'(calculado)'} · Con embalaje: <b>${eur3(ct)}</b><br>Precio sugerido (margen ${pct(AJ().margen)}): <b>${sg?eur(sg):'–'}</b> · Margen con tu precio: <b>${t.precio>0?pct((t.precio-cu)/t.precio):'–'}</b>`;
+}
+function saveProd(id){
+  const old=id?prod(id):{id:uid('p')};const n=readProd(old);
+  if(!n.nombre){toast('Pon un nombre al producto');return}
+  if(S.productos.some(q=>q.id!==n.id&&q.nombre.toLowerCase()===n.nombre.toLowerCase())){toast('Ya existe un producto con ese nombre');return}
+  if(n.tipo==='Pack'&&!n.base){toast('Elige el producto base del pack');return}
+  if(id)Object.assign(old,n);else S.productos.push(n);
+  save();closeModal();toast('Producto guardado');render();
+}
+function delProd(id){
+  const p=prod(id),n=S.pedidos.filter(o=>o.producto===id).length+S.impresiones.filter(i=>i.productoId===id).length;
+  ask('Borrar producto',`<p>Se borrará <b>${esc(p.nombre)}</b>${n?`. Tiene ${n} pedido(s)/impresión(es) asociados que quedarán sin producto (los gramos ya restados no se devuelven).`:'.'}</p>`,()=>{
+    S.productos=S.productos.filter(x=>x.id!==id);S.productos.forEach(q=>{if(q.base===id)q.base=''});save();toast('Producto borrado');render();
+  },'Borrar');
+}
+
+/* ---------- PEDIDOS ---------- */
+let PEF='';
+function vPedidos(){
+  const os=S.pedidos.filter(o=>!PEF||o.estado===PEF).slice().sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  const cont=S.pedidos.filter(o=>o.estado==='Enviado'||o.estado==='Cobrado');
+  const sum=(a,f)=>a.reduce((x,o)=>x+f(o),0);
+  const ec={Pendiente:'low',Enviado:'info',Cobrado:'ok',Cancelado:'neu'};
+  const top=`<h2>Pedidos</h2><p class="sub">Solo los pedidos Enviados o Cobrados cuentan como venta y restan stock. Pendiente y Cancelado no cuentan.</p>
+  <div class="kpis">
+   <div class="kpi"><small>Pendientes</small><b>${S.pedidos.filter(o=>o.estado==='Pendiente').length}</b><em>Encargados, sin enviar</em></div>
+   <div class="kpi"><small>Por cobrar</small><b>${eur(sum(S.pedidos.filter(o=>o.estado==='Enviado'),oTotal))}</b><em>Enviados sin cobrar</em></div>
+   <div class="kpi"><small>Cobrado</small><b>${eur(sum(S.pedidos.filter(o=>o.estado==='Cobrado'),oTotal))}</b><em>Pagado</em></div>
+   <div class="kpi y"><small>Beneficio contabilizado</small><b>${eur(sum(cont,o=>oTotal(o)-oCoste(o)))}</b><em>Enviado + Cobrado</em></div></div>
+  <div class="bar"><button class="btn blue" onclick="openPedido('')">+ Nuevo pedido</button><span class="sp"></span>
+   <label style="display:flex;gap:6px;align-items:center">Estado<select onchange="PEF=this.value;render()" style="margin:0;width:auto">${opts([['','Todos'],...ESTADOS],PEF)}</select></label></div>`;
+  if(isMob())return top+(os.map(o=>{const p=prod(o.producto);return`<div class="lcard ${o.estado==='Cancelado'?'cancel':''}"><div class="lr"><b>${esc(o.cliente||'(sin cliente)')}</b>${chip(ec[o.estado]||'neu',o.estado)}</div><div class="hint">${fdate(o.fecha)} · ${p?esc(p.nombre):'(producto borrado)'}</div><div class="kv"><span>Cant. <b>${n0(o.cant)}</b></span>${num(o.desc)?`<span>Dto. <b>${n0(o.desc)}%</b></span>`:''}<span>Total <b>${eur(oTotal(o))}</b></span><span>Benef. <b>${eur(oTotal(o)-oCoste(o))}</b></span></div><div class="lr"><span></span><button class="ico" onclick="openPedido('${o.id}')">Editar</button></div></div>`}).join('')||'<p class="hint">Sin pedidos.</p>');
+  return top+`<div class="tw"><table><tr><th>Fecha</th><th class="l">Cliente</th><th class="l">Producto</th><th>Cant.</th><th>Dto.</th><th>Total</th><th>Coste</th><th>Beneficio</th><th>Estado</th><th></th></tr>
+  ${os.map(o=>{const p=prod(o.producto);return`<tr class="${o.estado==='Cancelado'?'cancel':''}"><td>${fdate(o.fecha)}</td><td class="l">${esc(o.cliente)}</td><td class="l">${p?esc(p.nombre):'<span class="neg">(producto borrado)</span>'}</td><td>${n0(o.cant)}</td><td>${num(o.desc)?n0(o.desc)+'%':'–'}</td><td>${eur(oTotal(o))}</td><td>${eur(oCoste(o))}</td><td>${eur(oTotal(o)-oCoste(o))}</td><td>${chip(ec[o.estado]||'neu',o.estado)}</td><td><button class="ico" onclick="openPedido('${o.id}')">Editar</button></td></tr>`}).join('')||'<tr><td colspan="10" class="hint">Sin pedidos.</td></tr>'}</table></div>`;
+}
+function openPedido(id){
+  const o=id?S.pedidos.find(x=>x.id===id):{fecha:today(),cliente:'',producto:'',cant:1,desc:0,estado:'Pendiente',notas:''};
+  modal(id?'Editar pedido':'Nuevo pedido',`<form id="mform" onsubmit="return false"><div class="fg">
+   <label>Fecha<input type="date" name="fecha" value="${esc(o.fecha)}"></label>
+   <label>Cliente<input name="cliente" value="${esc(o.cliente)}"></label>
+   <label class="w2">Producto<select name="producto">${opts([['','— elige —'],...S.productos.map(p=>[p.id,p.nombre])],o.producto)}</select></label>
+   <label>Cantidad<input type="number" name="cant" min="1" step="1" value="${esc(o.cant)}"></label>
+   <label>Descuento (%)<input type="number" name="desc" min="0" max="100" step="any" value="${esc(o.desc)}"></label>
+   <label>Estado<select name="estado">${opts(ESTADOS,o.estado)}</select></label>
+   <label class="wall">Notas<input name="notas" value="${esc(o.notas||'')}"></label></div></form>`,()=>{
+    const n={fecha:fv('fecha'),cliente:fv('cliente').trim(),producto:fv('producto'),cant:num(fv('cant')),desc:Math.min(100,Math.max(0,num(fv('desc')))),estado:fv('estado'),notas:fv('notas')};
+    if(!n.producto||n.cant<=0){toast('Elige producto y cantidad');return}
+    if(id)Object.assign(o,n);else S.pedidos.push(Object.assign({id:uid('o')},n));
+    save();closeModal();render();
+  },{extra:id?`<button class="btn warn" onclick="delPedido('${id}')">Borrar</button>`:''});
+}
+function delPedido(id){ask('Borrar pedido','<p>Se borrará el pedido.</p>',()=>{S.pedidos=S.pedidos.filter(o=>o.id!==id);save();render()},'Borrar')}
+
+/* ---------- FILAMENTO ---------- */
+let FMAT='',FALERT=false,FMARCA='',FTAG='',FT=[];
+const tagList=()=>{const s=new Set(TIPOS);S.filamentos.forEach(f=>(f.etiquetas||[]).forEach(t=>s.add(t)));return[...s].sort((a,b)=>a.localeCompare(b,'es'))};
+const marcaList=()=>[...new Set(S.filamentos.map(f=>f.marca).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+const tagChips=f=>(f.etiquetas||[]).map(t=>`<span class="tg">${esc(t)}</span>`).join(' ');
+function fClear(){FMAT='';FMARCA='';FTAG='';FALERT=false;render()}
+function vFilamento(){
+  const list=S.filamentos.filter(f=>(!FMAT||f.material===FMAT)&&(!FMARCA||(FMARCA==='__none'?!f.marca:f.marca===FMARCA))&&(!FTAG||(f.etiquetas||[]).includes(FTAG))&&(!FALERT||fEstado(f)[0]!=='ok'));
+  const valor=S.filamentos.reduce((a,f)=>a+num(f.gramos)/1000*num(f.precio),0),g=S.filamentos.reduce((a,f)=>a+num(f.gramos),0);
+  const mob=isMob();let h='';
+  matList().forEach(m=>{
+    const it=list.filter(f=>f.material===m);if(!it.length)return;
+    h+=mob?`<div class="mband">${esc(m)}</div>`:`<tr class="band"><td colspan="10">${esc(m)}</td></tr>`;
+    it.forEach(f=>{const[k,t]=fEstado(f),max=Math.max(1000,num(f.comprados)*1000),w=Math.max(0,Math.min(100,num(f.gramos)/max*100));
+      const q=esc((f.color+' '+f.marca+' '+(f.etiquetas||[]).join(' ')+' '+f.material).toLowerCase());
+      h+=mob?`<div class="lcard fcard" data-q="${q}"><div class="fhead" style="background:${esc(fHex(f)||'#3a3a44')}"><b class="fn">${esc(f.color)}</b><span class="fc">${fColName(f)}</span></div><div class="fbody"><div class="lr"><span class="hint">${f.marca?esc(f.marca):'Sin marca'} ${tagChips(f)}</span>${chip(k,t)}</div>
+        <div style="margin:8px 0"><span class="meter ${k==='ok'?'':k}"><i style="width:${w}%"></i></span><b>${n0(f.gramos)} g</b> <span class="hint">(${rl(num(f.gramos)/1000)})</span></div>
+        <div class="lr"><span class="hint">Mín. ${num(f.minimo)||'–'} · ${num(f.precio)?eur(f.precio):'sin precio'}</span><span><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" onclick="filPlus('${f.id}')">+1 rollo</button></span></div></div></div>`
+      :`<tr data-q="${q}"><td>${tagChips(f)}</td><td>${esc(f.marca)}</td><td class="l" style="white-space:normal">${fSw(f)} ${esc(f.color)} <span class="hint">${fColName(f)}</span></td>
+      <td class="l"><span class="meter ${k==='ok'?'':k}"><i style="width:${w}%"></i></span>${n0(f.gramos)} g <span class="hint">(${rl(num(f.gramos)/1000)})</span></td>
+      <td>${num(f.comprados)}</td><td>${num(f.minimo)||'–'}</td><td>${num(f.precio)?eur(f.precio):'<span class="hint">sin precio</span>'}</td><td>${eur(num(f.gramos)/1000*num(f.precio))}</td><td>${chip(k,t)}</td>
+      <td style="white-space:nowrap"><button class="ico" onclick="openFil('${f.id}')">Editar</button> <button class="ico" title="Añadir un rollo nuevo (+1000 g)" onclick="filPlus('${f.id}')">+1 rollo</button></td></tr>`});
+  });
+  return`<h2>Filamento</h2><p class="sub">El stock se guarda en <b>gramos</b>. Cada impresión registrada en Imprimir resta de aquí. Al comprar un rollo nuevo pulsa "+1 rollo" (suma 1.000 g). Todos tus rollos actuales se han convertido a 1.000 g cada uno; si alguno está empezado, ajústalo con Editar.</p>
+  <div class="bar"><button class="btn blue" onclick="openFil('')">+ Nuevo filamento</button>
+   <input type="search" placeholder="Buscar color, marca…" oninput="fSearch(this.value)" style="width:${mob?'100%':'200px'}">
+   <select onchange="FMARCA=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Marca"><option value="">Marca: todas</option>${marcaList().map(m=>`<option ${FMARCA===m?'selected':''}>${esc(m)}</option>`).join('')}<option value="__none" ${FMARCA==='__none'?'selected':''}>Sin marca</option></select>
+   <select onchange="FTAG=this.value;render()" style="width:${mob?'48%':'auto'}" aria-label="Etiqueta"><option value="">Etiqueta: todas</option>${tagList().map(m=>`<option ${FTAG===m?'selected':''}>${esc(m)}</option>`).join('')}</select>
+   ${(FMAT||FMARCA||FTAG||FALERT)?`<button class="btn ghost" onclick="fClear()">✕ Quitar filtros</button>`:''}
+   <label style="display:flex;gap:6px;align-items:center;margin:0"><input type="checkbox" ${FALERT?'checked':''} onchange="FALERT=this.checked;render()" style="width:auto;min-height:0"> Solo alertas</label>
+   <span class="sp"></span>${['',...matList()].map(m=>`<button class="btn ${FMAT===m?'':'ghost'}" onclick="FMAT='${m}';render()">${m||'Todos'}</button>`).join('')}</div>
+  ${mob?h+`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${n0(g)} g · ${eur(valor)}</b></div></div>`
+  :`<div class="tw"><table><tr><th>Etiquetas</th><th>Marca</th><th class="l">Color / referencia</th><th class="l">Restante</th><th>Comprados</th><th>Mínimo</th><th>Precio rollo</th><th>Valor stock</th><th>Estado</th><th></th></tr>${h||'<tr><td colspan="10" class="hint">Sin resultados.</td></tr>'}
+  <tr class="tot"><td colspan="3" class="l">TOTAL</td><td class="l">${n0(g)} g (${rl(g/1000)})</td><td colspan="3"></td><td>${eur(valor)}</td><td colspan="2"></td></tr></table></div>`}
+  <p class="hint">Mostrando ${list.length} de ${S.filamentos.length} filamentos${(FMAT||FMARCA||FTAG||FALERT)?' (con filtros)':''}.</p><p class="legend">Estados: ● OK · ▲ BAJO (en el mínimo o por debajo) · ✖ AGOTADO (0 g).</p>`;
+}
+function fSearch(v){v=v.toLowerCase();document.querySelectorAll('[data-q]').forEach(r=>{r.style.display=r.dataset.q.includes(v)?'':'none'})}
+function filPlus(id){const f=fil(id);f.gramos=num(f.gramos)+1000;f.comprados=num(f.comprados)+1;save();toast('+1 rollo: '+f.color);render()}
+function openFil(id){
+  FT=id?[...(fil(id).etiquetas||[])]:[];
+  const f=id?fil(id):{material:FMAT||'PLA',etiquetas:[],marca:'',color:'',comprados:1,gramos:1000,minimo:0,precio:0};
+  modal(id?'Editar filamento':'Nuevo filamento',`<form id="mform" onsubmit="return false"><div class="fg">
+   <label>Material<select name="material">${opts(matList(),f.material)}</select></label>
+   <div class="w2"><span class="lbl">Etiquetas (acabado, tipo…)</span><div id="tgbox"></div>
+    <div style="display:flex;gap:6px;margin-top:6px"><input id="tgnew" placeholder="Nueva etiqueta…" onkeydown="if(event.key==='Enter'){event.preventDefault();fetAdd()}"><button type="button" class="btn ghost" onclick="fetAdd()">+ Crear</button></div></div>
+   <label>Marca<input name="marca" list="marcas" value="${esc(f.marca)}"><datalist id="marcas">${[...new Set(S.filamentos.map(x=>x.marca).filter(Boolean))].map(m=>`<option value="${esc(m)}">`).join('')}</datalist></label>
+   <label class="w2">Color / referencia<input name="color" value="${esc(f.color)}"></label>
+   <div class="w2"><span class="lbl">Color visual</span><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><input type="color" name="hex" id="hexin" value="${esc(fHex(f)||'#888888')}" oninput="hexShow()" style="width:64px;height:44px;padding:2px"><b id="hexname"></b><button type="button" class="btn ghost" onclick="hexGuess()">Detectar por el nombre</button></div></div>
+   <label>Comprados (rollos)<input type="number" name="comprados" step="1" value="${esc(f.comprados)}"></label>
+   <label>Restante (gramos)<input type="number" name="gramos" step="any" value="${esc(f.gramos)}"></label>
+   <label>Mínimo (rollos, 0 = sin aviso)<input type="number" name="minimo" step="any" value="${esc(f.minimo)}"></label>
+   <label>Precio por rollo (€)<input type="number" name="precio" step="any" value="${esc(f.precio)}"></label></div></form>`,()=>{
+    const n={hex:fv('hex'),material:fv('material'),etiquetas:[...FT],marca:fv('marca').trim(),color:fv('color').trim(),comprados:num(fv('comprados')),gramos:num(fv('gramos')),minimo:num(fv('minimo')),precio:num(fv('precio'))};
+    if(!n.color){toast('Pon el color o referencia');return}
+    if(id)Object.assign(f,n);else S.filamentos.push(Object.assign({id:uid('f')},n));
+    save();closeModal();render();
+  },{extra:id?`<button class="btn warn" onclick="delFil('${id}')">Borrar</button>`:''});
+  fetDraw();hexShow();
+}
+function hexShow(){const i=document.getElementById('hexin'),b=document.getElementById('hexname');if(i&&b)b.innerHTML=`<i class="cdot big" style="background:${esc(i.value)}"></i> ≈ ${esc(hexName(i.value))}`}
+function hexGuess(){const g=guessHex(fv('color'));if(!g){toast('No reconozco ese nombre: elige el color a mano');return}document.getElementById('hexin').value=g;hexShow()}
+function fetDraw(){const b=document.getElementById('tgbox');if(!b)return;b.innerHTML=tagList().concat(FT.filter(t=>!tagList().includes(t))).map(t=>{const on=FT.includes(t);return`<button type="button" class="tgb ${on?'on':''}" onclick="fetTog(this.dataset.t)" data-t="${esc(t)}">${on?'✓ ':''}${esc(t)}</button>`}).join(' ')}
+function fetTog(t){FT=FT.includes(t)?FT.filter(x=>x!==t):[...FT,t];fetDraw()}
+function fetAdd(){const i=document.getElementById('tgnew'),t=i.value.trim();if(!t)return;const ex=tagList().find(x=>x.toLowerCase()===t.toLowerCase());const v=ex||t;if(!FT.includes(v))FT.push(v);i.value='';fetDraw()}
+function delFil(id){const f=fil(id);ask('Borrar filamento',`<p>Se borrará <b>${esc(f.color)}</b>. Las recetas y el historial que lo usaban lo mostrarán como borrado.</p>`,()=>{S.filamentos=S.filamentos.filter(x=>x.id!==id);S.productos.forEach(p=>{if(p.ficha&&p.ficha.fils)p.ficha.fils=p.ficha.fils.filter(x=>x.fid!==id)});save();render()},'Borrar')}
+
+/* ---------- GASTOS ---------- */
+function vGastos(){
+  const tot=S.gastos.reduce((a,g)=>a+gTotal(g),0),d=S.gastos.filter(g=>g.desc).reduce((a,g)=>a+gTotal(g),0);
+  const head=`<h2>Gastos</h2><p class="sub">Apunta los gastos en positivo. Los marcados "Descuenta: Sí" restan del beneficio real (inversión de la web y la impresora). Los demás se muestran pero no restan, por ejemplo el filamento, que ya controlas en su stock.</p>
+  <div class="bar"><button class="btn blue" onclick="openGasto('')">+ Nuevo gasto</button></div>`;
+  if(isMob())return head+S.gastos.map(g=>`<div class="lcard"><div class="lr"><b>${esc(g.concepto)}</b>${g.desc?chip('info','DESCUENTA: SÍ'):chip('neu','DESCUENTA: NO')}</div><div class="hint">${esc(g.cat)} · ${n0(g.cant)} × ${eur(g.precio)}</div><div class="lr"><b>${eur(gTotal(g))}</b><button class="ico" onclick="openGasto('${g.id}')">Editar</button></div></div>`).join('')
+    +`<div class="lcard tot"><div class="lr"><b>TOTAL</b><b>${eur(tot)}</b></div><div class="hint">Descuentan del beneficio: ${eur(d)}</div></div>`;
+  return head+`<div class="tw"><table><tr><th class="l">Concepto</th><th>Categoría</th><th>Cantidad</th><th>Precio ud</th><th>Total</th><th>Descuenta del beneficio</th><th></th></tr>
+  ${S.gastos.map(g=>`<tr><td class="l">${esc(g.concepto)}</td><td>${esc(g.cat)}</td><td>${n0(g.cant)}</td><td>${eur(g.precio)}</td><td>${eur(gTotal(g))}</td><td>${g.desc?chip('info','Sí'):chip('neu','No')}</td><td><button class="ico" onclick="openGasto('${g.id}')">Editar</button></td></tr>`).join('')||'<tr><td colspan="7" class="hint">Sin gastos.</td></tr>'}
+  <tr class="tot"><td class="l">TOTAL</td><td></td><td></td><td></td><td>${eur(tot)}</td><td>Descuentan: ${eur(d)}</td><td></td></tr></table></div>`;
+}
+function openGasto(id){
+  const g=id?S.gastos.find(x=>x.id===id):{concepto:'',cat:'Otros',cant:1,precio:0,desc:true};
+  modal(id?'Editar gasto':'Nuevo gasto',`<form id="mform" onsubmit="return false"><div class="fg">
+   <label class="w2">Concepto<input name="concepto" value="${esc(g.concepto)}"></label>
+   <label>Categoría<select name="cat">${opts(CATS,g.cat)}</select></label>
+   <label>Cantidad<input type="number" name="cant" step="any" value="${esc(g.cant)}"></label>
+   <label>Precio ud (€)<input type="number" name="precio" step="any" value="${esc(g.precio)}"></label>
+   <label style="display:flex;gap:8px;align-items:center;margin-top:20px"><input type="checkbox" name="desc" ${g.desc?'checked':''} style="width:auto;margin:0;min-height:0"> Descuenta del beneficio real</label></div></form>`,()=>{
+    const n={concepto:fv('concepto').trim(),cat:fv('cat'),cant:num(fv('cant')),precio:Math.abs(num(fv('precio'))),desc:fv('desc')};
+    if(!n.concepto){toast('Pon un concepto');return}
+    if(id)Object.assign(g,n);else S.gastos.push(Object.assign({id:uid('g')},n));
+    save();closeModal();render();
+  },{extra:id?`<button class="btn warn" onclick="delGasto('${id}')">Borrar</button>`:''});
+}
+function delGasto(id){ask('Borrar gasto','<p>Se borrará el gasto.</p>',()=>{S.gastos=S.gastos.filter(g=>g.id!==id);save();render()},'Borrar')}
+
+/* ---------- MÁS (móvil) ---------- */
+function vMas(){return`<h2>Más</h2><p class="sub">Otras secciones de la app.</p>`+[['pedidos','Pedidos','Pedidos, cobros y beneficio contabilizado'],['gastos','Gastos','Inversión y gastos'],['notas','Notas','Contactos, enlaces e ideas'],['ajustes','Ajustes','Parámetros de coste y copia de seguridad']].map(([k,l,d])=>`<button class="lcard menu" onclick="go('${k}')"><b>${l}</b><span class="hint">${d}</span></button>`).join('')}
+
+/* ---------- NOTAS ---------- */
+function vNotas(){return`<h2>Notas</h2><p class="sub">Contactos, proveedores, enlaces e ideas. Se guarda solo al escribir.</p><textarea oninput="S.notas=this.value;clearTimeout(vNotas.t);vNotas.t=setTimeout(save,400)">${esc(S.notas)}</textarea>`}
+
+/* ---------- AJUSTES ---------- */
+function vAjustes(){
+  const a=AJ(),inp=(k,l,step,pre)=>`<label>${l}<input type="number" step="${step||'any'}" value="${esc(a[k])}" oninput="setAj('${k}',this.value)"></label>`;
+  return`<h2>Ajustes</h2><p class="sub">Parámetros de los cálculos y copias de seguridad.</p>
+  <section class="card"><h3>Parámetros de coste</h3><div class="fg">
+   ${inp('elec','Electricidad (€ por hora)')}${inp('impresora','Precio de la impresora para desgaste (€)')}${inp('vida','Vida útil de la impresora (horas)')}
+   <label>Merma de plástico (0,15 = 15 %)<input type="number" step="any" value="${esc(a.merma)}" oninput="setAj('merma',this.value)"></label>
+   <label>Margen objetivo (0,6 = 60 %)<input type="number" step="any" value="${esc(a.margen)}" oninput="setAj('margen',this.value)"></label>
+   ${inp('precioKg','Precio medio del filamento (€/kg), si un rollo no tiene precio')}
+   <label>Contar regalados como coste extra<select onchange="setAj('regalados',this.value,true)">${opts(['Sí','No'],a.regalados)}</select></label>
+   <label>Embalaje: coste de un envío en sobre (€)<input type="number" step="any" value="${esc(S.embalaje.sobre)}" oninput="S.embalaje.sobre=num(this.value);save()"></label>
+   <label>Embalaje: coste de un envío en caja (€)<input type="number" step="any" value="${esc(S.embalaje.caja)}" oninput="S.embalaje.caja=num(this.value);save()"></label></div>
+   <p class="hint">Regalados: con "Sí" su coste se resta otra vez (como hacía tu Excel); con "No" se evita el doble conteo, porque ya están dentro de los fabricados.</p></section>
+  <section class="card dark"><h3>Copia de seguridad</h3>
+   <p class="sub">Todos los datos se guardan en este navegador (no en GitHub). Si borras los datos del navegador, se pierden. Exporta una copia de vez en cuando; también sirve para pasar los datos de un dispositivo a otro.</p>
+   <div class="bar"><button class="btn blue" onclick="exportJSON()">⬇ Exportar copia (.json)</button><button class="btn ghost" onclick="$('#fjson').click()">⬆ Importar copia</button>
+   <button class="btn warn" onclick="resetAll()">Volver a los datos iniciales del Excel</button></div>
+   <p class="hint">Última copia: ${S.meta.lastBackup?new Date(S.meta.lastBackup).toLocaleString('es-ES'):'nunca'}</p></section>`;
+}
+function setAj(k,v,txt){S.ajustes[k]=txt?v:num(v);save()}
+function exportJSON(){
+  S.meta.lastBackup=new Date().toISOString();save();
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));
+  a.download='ept-gestion-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();toast('Copia exportada');render();
+}
+async function importJSON(file){
+  if(!file)return;
+  try{const d=JSON.parse(await file.text());if(!d.filamentos||!d.productos)throw new Error('no parece una copia de esta app');
+    ask('Importar copia',`<p>Se reemplazarán <b>todos</b> los datos actuales por los de la copia (${d.productos.length} productos, ${d.filamentos.length} filamentos).</p>`,()=>{S=fix(d);save();toast('Copia importada');render()},'Importar');
+  }catch(e){toast('⚠ Copia no válida: '+e.message)}
+}
+function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{S=fix(JSON.parse(JSON.stringify(SEED)));save();toast('Datos iniciales cargados');render()},'Restaurar')}
+
+applyTheme();
+render();
+</script>
+</body>
+</html>
