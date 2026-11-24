@@ -891,6 +891,12 @@ function fZero(){const n=S.filamentos.filter(f=>num(f.gramos)!==0).length,g=S.fi
 let TESS_P=null,OCRTOK=0,OCRLOG='';
 function tessLoad(){return TESS_P||(TESS_P=new Promise((res,rej)=>{if(window.Tesseract)return res(window.Tesseract);const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';sc.onload=()=>window.Tesseract?res(window.Tesseract):(TESS_P=null,rej(new Error('lib')));sc.onerror=()=>{TESS_P=null;rej(new Error('offline'))};document.head.appendChild(sc)}))}
 function ocrCanvas(img,ang){const mx=2400,k=Math.min(1,mx/Math.max(img.width,img.height)),w=Math.round(img.width*k),h=Math.round(img.height*k),c=document.createElement('canvas'),sw=ang%180!==0;c.width=sw?h:w;c.height=sw?w:h;const x=c.getContext('2d');x.translate(c.width/2,c.height/2);x.rotate(ang*Math.PI/180);x.drawImage(img,-w/2,-h/2,w,h);return c}
+function ocrBin(c){const w=c.width,h=c.height,x=c.getContext('2d'),d=x.getImageData(0,0,w,h),p=d.data,g=new Uint8Array(w*h);let mn=255,mx=0;
+  for(let i=0,j=0;j<w*h;i+=4,j++){const v=(p[i]*299+p[i+1]*587+p[i+2]*114)/1000|0;g[j]=v;if(v<mn)mn=v;if(v>mx)mx=v}
+  const I=new Float64Array((w+1)*(h+1));for(let y=0;y<h;y++){let r=0;for(let xx=0;xx<w;xx++){r+=g[y*w+xx];I[(y+1)*(w+1)+xx+1]=I[y*(w+1)+xx+1]+r}}
+  const R=Math.max(12,Math.round(Math.min(w,h)/60));
+  for(let y=0;y<h;y++){const y0=Math.max(0,y-R),y1=Math.min(h,y+R+1);for(let xx=0;xx<w;xx++){const x0=Math.max(0,xx-R),x1=Math.min(w,xx+R+1),m=(I[y1*(w+1)+x1]-I[y0*(w+1)+x1]-I[y1*(w+1)+x0]+I[y0*(w+1)+x0])/((x1-x0)*(y1-y0)),v=g[y*w+xx]<m-12?0:255,i=(y*w+xx)*4;p[i]=p[i+1]=p[i+2]=v;p[i+3]=255}}
+  x.putImageData(d,0,0);return c}
 function ocrCode(t){const m=String(t||'').match(/(?<!\d)1\d{4}(?!\d)/g)||[];return m.find(c=>bblFind(c))||''}
 function ocrScan(){const i=document.getElementById('ocrf');if(!i)return;i.value='';i.click()}
 function ocrMsg(t){const e=document.getElementById('ocrmsg');if(e)e.textContent=t}
@@ -902,11 +908,11 @@ async function ocrFile(inp){
     const T=await tessLoad();if(tok!==OCRTOK)return;
     const url=URL.createObjectURL(file),img=await new Promise((ok,ko)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=()=>ko(new Error('img'));im.src=url});
     w=await T.createWorker('eng');
-    for(const psm of ['6','11']){
+    for(const [psm,bin] of [['6',0],['6',1],['11',0]]){
       await w.setParameters({tessedit_pageseg_mode:psm});
       for(const ang of [0,90,270,180]){
-        if(tok!==OCRTOK)break;ocrMsg('Leyendo la etiqueta… ('+(ang?'girada '+ang+'°':'foto original')+(psm==='11'?', 2.º intento':'')+')');
-        const r=await w.recognize(ocrCanvas(img,ang)),tx=(r&&r.data&&r.data.text)||'';OCRLOG+='['+psm+'/'+ang+'°] '+tx.replace(/\s+/g,' ').trim().slice(0,160)+'\n';code=ocrCode(tx);if(code)break}
+        if(tok!==OCRTOK)break;ocrMsg('Leyendo la etiqueta… ('+(ang?'girada '+ang+'°':'foto original')+(bin?', con contraste':psm==='11'?', 3.er intento':'')+')');
+        const cv=ocrCanvas(img,ang),r=await w.recognize(bin?ocrBin(cv):cv),tx=(r&&r.data&&r.data.text)||'';OCRLOG+='['+psm+(bin?'b':'')+'/'+ang+'°] '+tx.replace(/\s+/g,' ').trim().slice(0,160)+'\n';code=ocrCode(tx);if(code)break}
       if(code||tok!==OCRTOK)break}
     URL.revokeObjectURL(url);
   }catch(e){if(tok===OCRTOK){closeModal();OCRLOG='Error: '+(e&&e.message||e)+'\n'+OCRLOG;ocrManual('No he podido leer la foto con el lector ('+(e&&e.message==='offline'?'sin internet':'error: '+(e&&e.message||e))+'). Escribe a mano el «Filament Code» de la etiqueta.')}return}
@@ -971,6 +977,8 @@ function cpRender(){
      <label>Filamento<select onchange="cpSel(${i},this.value)">${cpOpts(l.fid)}</select></label>
      ${l.fid==='__new'?`<div class="fg"><label>Material<select onchange="CP.lineas[${i}].material=this.value">${opts(matList(),l.material)}</select></label>
        <label>Marca<select onchange="CP.lineas[${i}].marca=this.value;cpRender()">${marcaOpts(l.marca)}</select>${l.marca==='__otra'?`<input value="${esc(l.marcaNueva||'')}" onchange="CP.lineas[${i}].marcaNueva=this.value" placeholder="Nombre de la marca" style="margin-top:6px">`:''}</label>
+       <div class="w2"><span class="lbl">Etiquetas (acabado, tipo…)</span><div>${tagList().concat((l.etiquetas||[]).filter(t=>!tagList().includes(t))).map(t=>{const on=(l.etiquetas||[]).includes(t);return`<button type="button" class="tgb ${on?'on':''}" onclick="cpTag(${i},this.dataset.t)" data-t="${esc(t)}">${on?'✓ ':''}${esc(t)}</button>`}).join(' ')}</div>
+        <div style="display:flex;gap:6px;margin-top:6px"><input id="cptgn${i}" placeholder="Nueva etiqueta…" onkeydown="if(event.key==='Enter'){event.preventDefault();cpTagNew(${i})}"><button type="button" class="btn ghost" onclick="cpTagNew(${i})">+ Crear</button></div></div>
        <label>Color<input value="${esc(l.color)}" onchange="CP.lineas[${i}].color=this.value" placeholder="Ej. ROJO"></label>
        <label>Referencia / código<input value="${esc(l.ref||'')}" onchange="CP.lineas[${i}].ref=this.value" placeholder="Ej. 10200"></label>
        <div class="w2"><button type="button" class="btn ghost" onclick="CP.lineas[${i}].ref=this.closest('.fg').querySelectorAll('input')[1].value;bblCp(${i})">🔎 Detectar Bambu Lab</button>${l.bbl?` <span class="hint">✔ ${esc(l.bbl)}</span>`:''}</div></div>`:''}
@@ -981,6 +989,8 @@ function cpRender(){
    <p class="hint">El precio por rollo que pongas pasa a ser el precio actual de ese filamento (si lo dejas vacío se mantiene el que tenía). Los rollos nuevos se suman al stock en gramos (1 rollo = 1.000 g).</p>`;
   cpTot();
 }
+function cpTag(i,t){const l=CP.lineas[i];l.etiquetas=l.etiquetas||[];l.etiquetas=l.etiquetas.includes(t)?l.etiquetas.filter(x=>x!==t):[...l.etiquetas,t];cpRender()}
+function cpTagNew(i){const e=document.getElementById('cptgn'+i),t=(e.value||'').trim();if(!t)return;const l=CP.lineas[i],ex=tagList().find(x=>x.toLowerCase()===t.toLowerCase())||t;l.etiquetas=l.etiquetas||[];if(!l.etiquetas.includes(ex))l.etiquetas.push(ex);cpRender()}
 function cpSel(i,v){CP.lineas[i].fid=v;const f=v&&v!=='__new'?fil(v):null;if(f&&!CP.lineas[i].precio&&num(f.precio))CP.lineas[i].precio=num(f.precio);cpRender()}
 function cpDel(i){CP.lineas.splice(i,1);cpRender()}
 function cpTot(){const e=document.getElementById('cptot');if(!e)return;let r=0,t=0;CP.lineas.forEach(l=>{const f=l.fid&&l.fid!=='__new'?fil(l.fid):null,n=num(l.rollos),p=l.precio!==''?num(l.precio):(f?num(f.precio):0);r+=n;t+=n*p});e.innerHTML=`Total: <b>${n0(r)} rollos · ${eur(t)}</b>`}
@@ -1135,8 +1145,8 @@ async function importJSON(file){
 function resetAll(){ask('Volver a los datos iniciales','<p>Se borrarán todos los cambios (impresiones, pedidos, stock) y se cargarán de nuevo los datos que había en tu Excel. Exporta una copia antes si quieres conservarlos.</p>',()=>{const sn=snapU();S=fix(JSON.parse(JSON.stringify(SEED)));freezeOrders();save();toastU('Datos iniciales cargados.',sn);render()},'Restaurar')}
 
 /* ---------- sincronización con Supabase (sin login, con clave de acceso) ---------- */
-const APP_VERSION='1.19';
-const APP_NOTAS='v1.19 · El lector muestra qué ha leído cuando falla. v1.18 · Al leer la etiqueta pregunta cuántos rollos añades. v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
+const APP_VERSION='1.21';
+const APP_NOTAS='v1.21 · Etiquetas al crear un filamento nuevo desde Registrar compra. v1.20 · El lector prueba también con la foto en alto contraste. v1.19 · El lector muestra qué ha leído cuando falla. v1.18 · Al leer la etiqueta pregunta cuántos rollos añades. v1.17 · «Leer etiqueta Bambu» abre la cámara y está junto a Registrar compra. v1.16 · Botón «Leer etiqueta Bambu»: foto de la caja → rellena el rollo (con opción de sumar o no a Comprados). v1.15 · Las flechas de Restante (gramos) suben de 1000 en 1000. v1.14 · Botón «Stock a 0» en Filamento (con Deshacer). v1.13 · Casilla de revisado en cada filamento para el inventario (contador, filtro «solo sin revisar» y botón para empezar de nuevo). v1.12 · Lista de filamento más compacta (filas más bajas, sin el nombre del color aproximado). v1.11 · Botón Detectar Bambu Lab: rellena el filamento a partir de la referencia (PLA, PETG, TPU y PC); material PC. v1.10 · Icono solo con la E; arrastrar filamentos para ordenarlos a tu gusto (orden por defecto). v1.09 · Enlace de conexión para sincronizar un navegador o dispositivo nuevo sin escribir los datos. v1.08 · App instalable (icono EPT, funciona sin conexión); filtros de material en su propia fila. v1.07 · Color y referencia por separado; columnas del filamento ordenables; botón Deshacer al borrar; el coste de cada pedido queda fijo; Panel filtrable por periodo; gastos con fecha. v1.06 · Selección múltiple y borrado en bloque de filamentos; arreglos de sincronización y de varias pestañas. v1.05 · Marca como lista desplegable. v1.04 · Pedidos con varios productos; el descuento y el precio de cada pedido cuentan en el beneficio. v1.03 · Color en muestra redondeada; Restante muestra rollos y gramos. v1.02 · La barra de stock ya no depende del total comprado. v1.01 · Logo ELPUTORIDER, nuevo orden del menú, registrar compras de filamento, banda de color en la tabla. (v1.1: sincronización, etiquetas, color visual.)';
 const SYNC_LS='ept_sync_v1';
 let SY=(()=>{try{return JSON.parse(localStorage.getItem(SYNC_LS))||{}}catch(e){return{}}})();
 let SYST=null,SYMSG='',SYBUSY=false,syTimer=null;
